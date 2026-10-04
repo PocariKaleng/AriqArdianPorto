@@ -1,0 +1,28 @@
+/* Technical notebook layer: static geometry with three slow motion accents. */
+body{position:relative;isolation:isolate;background-image:radial-gradient(circle,var(--backdrop-dot) .8px,transparent 1.2px);background-size:32px 32px}
+.hero::before{display:none}
+.technical-background{--blueprint:#d9e8b0;--far:.035;--guide:.065;--trace:.085;--node:.14;--note:.085;position:absolute;inset:0;width:100%;height:100%;z-index:-1;display:block;overflow:hidden;pointer-events:none;user-select:none;color:var(--blueprint)}
+:root[data-theme="light"] .technical-background{--blueprint:#536345;--far:.025;--guide:.045;--trace:.055;--node:.10;--note:.065}
+.technical-background path,.technical-background circle,.technical-background rect{vector-effect:non-scaling-stroke}
+.bg-far{fill:none;stroke:currentColor;stroke-width:1;opacity:var(--far)}
+.bg-guide{fill:none;stroke:currentColor;stroke-width:1;opacity:var(--guide)}
+.bg-trace{fill:none;stroke:currentColor;stroke-width:1;opacity:var(--trace)}
+.bg-nodes{fill:var(--bg);stroke:currentColor;stroke-width:1;opacity:var(--node)}
+.bg-note{fill:currentColor;opacity:var(--note);font:10px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:1px}
+.bg-orbit-turn{animation:blueprint-orbit 84s linear infinite;transform-origin:0 0}
+.bg-data{fill:none;stroke:currentColor;stroke-width:1.4;stroke-dasharray:3 450;opacity:var(--node);animation:blueprint-signal 14s linear infinite}
+.bg-pulse{fill:currentColor;opacity:.08;animation:blueprint-pulse 7s ease-in-out infinite}
+.bg-pixel{fill:currentColor;opacity:.27}
+:root[data-theme="light"] .bg-pixel{opacity:.24}
+.pixel-twinkle{animation:pixel-twinkle 9s steps(2,end) infinite}
+@keyframes pixel-twinkle{0%,70%,100%{opacity:.27}80%,90%{opacity:.13}}
+/* Tiny square markers echo the background bitmaps without changing text flow. */
+main .eyebrow::before{content:"";display:inline-block;width:5px;height:5px;margin-right:10px;background:var(--accent);box-shadow:3px -3px 0 color-mix(in srgb,var(--accent) 35%,transparent);vertical-align:2px}
+@media(max-width:600px){.pixel-detail{display:none}.bg-pixel{opacity:.18}.pixel-twinkle{animation:none}}
+@keyframes blueprint-orbit{to{transform:rotate(360deg)}}
+@keyframes blueprint-signal{from{stroke-dashoffset:453}to{stroke-dashoffset:0}}
+@keyframes blueprint-pulse{0%,100%{opacity:.07}50%{opacity:.15}}
+.technical-background.is-paused *{animation-play-state:paused!important}
+@media(max-width:1050px){.bg-secondary{display:none}}
+@media(max-width:600px){.bg-network,.bg-circuit,.bg-math,.bg-footer{display:none}.technical-background{--far:.03;--guide:.045;--note:.06}.bg-note{font-size:9px}.bg-orbit-turn{animation:none}}
+@media(prefers-reduced-motion:reduce){.technical-background *{animation:none!important}}

@@ -1,0 +1,117 @@
+.silk-background{position:fixed;inset:0;z-index:-2;pointer-events:none;overflow:hidden;background:linear-gradient(135deg,#02010a,#04052e 45%,#3d2c8d);opacity:.45}
+.silk-background canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0}
+.silk-background.is-ready canvas{opacity:1}
+:root[data-theme="light"] .silk-background{opacity:.10}
+.technical-background{opacity:.65}
+
+/* Silk palette: cool whites, lavender accents, and violet section dividers. */
+:root{--bg:#080713;--surface:#181426;--text:#f5f2ff;--muted:#c0b9d2;--line:#3e3553;--accent:#d2baff}
+:root[data-theme="light"]{--bg:#f6f3fc;--surface:#eae3f5;--text:#241b38;--muted:#625574;--line:#ddd3e9;--accent:#69429c}
+body{background-image:none}
+/* Keep the requested pixel accents; retire the earlier blueprint layer. */
+.technical-background{color:var(--accent)}
+.technical-background .bg-orbit,.technical-background .bg-guide,.technical-background .bg-network,.technical-background .bg-circuit,.technical-background .bg-math,.technical-background .bg-note,.technical-background .bg-footer{display:none}
+.header-capsule,:root[data-theme="light"] .header-capsule{background:#211b30;border-color:#4e4268;color:#f5f2ff}
+.site-header .wordmark .brand-symbol,.site-header .theme-icon{color:#d2baff}
+.site-header .wordmark span:last-child{color:#f5f2ff}
+.site-header nav a{color:#ccc3df}
+.site-header nav a::after{background:#d2baff}
+.site-header nav a:focus-visible{outline-color:#d2baff}
+.site-header .theme-toggle,.site-header .contact-nav{background:#342940;border-color:#665376;color:#f5f2ff}
+.site-header .theme-toggle:hover,.site-header .theme-toggle:focus-visible,.site-header .contact-nav:hover,.site-header .contact-nav:focus-visible{background:#4a385e;border-color:#d2baff}
+.brand{background:#d2baff;color:#261a3b}
+@media(max-width:720px){.site-header nav{border-top-color:#4e4268}}
+/* Selected projects use the same glass surface as the writing cards. */
+.project-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+.glass-selected{overflow:hidden;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--surface) 72%,transparent);backdrop-filter:blur(12px);box-shadow:0 12px 40px #00000012;transition:border-color .3s ease,box-shadow .3s ease}
+.glass-selected:hover,.glass-selected:focus-visible{border-color:var(--accent);box-shadow:0 16px 42px color-mix(in srgb,var(--accent) 12%,transparent)}
+.glass-selected .project-image{height:auto;aspect-ratio:16/9}
+.glass-selected .project-image img{filter:none;transition:transform .6s ease}
+.glass-selected:hover .project-image img{filter:none;transform:scale(1.045)}
+.glass-selected .image-label{top:auto;bottom:16px;left:18px;padding:7px 10px;border:1px solid var(--line);border-radius:30px;background:color-mix(in srgb,var(--bg) 80%,transparent);color:var(--text);text-shadow:none;font-size:11px;letter-spacing:.4px;backdrop-filter:blur(8px)}
+.glass-selected .project-open{width:auto;height:auto;border-radius:30px;padding:10px 15px;font-size:13px;background:var(--accent);color:var(--bg);opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s}
+.glass-selected:hover .project-open,.glass-selected:focus-visible .project-open{opacity:1;transform:none}
+.glass-selected .project-caption{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:24px}
+.glass-selected .project-caption h3{font-size:23px;line-height:1.3}
+.glass-selected .project-caption>span{font-size:12px;line-height:1.5}
+.glass-selected .selected-description{font-size:15px;line-height:1.7;color:var(--muted);margin:2px 0 8px;min-height:51px}
+.glass-selected .selected-author{width:100%;display:flex;gap:10px;align-items:center;color:var(--text)}
+.selected-author img{width:32px;height:32px;object-fit:cover;border-radius:50%}
+.selected-author small{display:block;color:var(--muted);font-size:12px}
+.glass-selected .brand-name{font-size:72px}.glass-selected .brand-name em{font-size:58px}
+/* Three editorial rows with cursor-tracked light on the groups and cards. */
+.page-about .credentials{grid-template-columns:1fr;gap:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Inter,Arial,sans-serif}
+.credentials-column{--spot-x:50%;--spot-y:50%;position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(205px,.3fr) minmax(0,1fr);align-items:start;gap:36px;padding:42px 10px;border-top:1px solid var(--line)}
+.credentials-column::after{content:"";position:absolute;inset:1px 0 0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 350px 210px at var(--spot-x) var(--spot-y),color-mix(in srgb,var(--accent) 11%,transparent),transparent 75%);opacity:0;transition:opacity .35s ease}
+.credentials-column.is-spotlit::after{opacity:1}
+.credentials-column>.credential-head,.credentials-column>.achievement-mount,.credentials-column>ol{position:relative;z-index:1;min-width:0}
+.credential-head{padding-top:3px}
+.credentials-column h2{margin:14px 0 10px;line-height:1.05}
+.credentials-column h2 em{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Inter,Arial,sans-serif;font-style:normal;font-weight:600;letter-spacing:-.045em;transition:color .3s ease,letter-spacing .35s ease}
+.credentials-column:hover h2 em{letter-spacing:-.06em}
+.credential-community-title span{font-size:.72em;letter-spacing:-.035em}
+.credentials-column .eyebrow{font-weight:700;letter-spacing:.12em}
+.credential-head p{max-width:210px;margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+.credentials-column ol,.credentials-column .achievement-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:13px;counter-reset:credential}
+.credentials-column li,.credentials-column .achievement-list li{--spot-x:50%;--spot-y:50%;position:relative;isolation:isolate;overflow:hidden;min-height:94px;align-items:center;padding:17px 18px;border:1px solid color-mix(in srgb,var(--line) 88%,transparent);border-radius:15px;background:color-mix(in srgb,var(--surface) 63%,transparent);backdrop-filter:blur(12px);box-shadow:0 10px 30px #00000013;font-weight:500;letter-spacing:-.02em;transition:background-color .25s ease,border-color .25s ease,box-shadow .3s ease}
+.credentials-column li::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle 190px at var(--spot-x) var(--spot-y),color-mix(in srgb,var(--accent) 27%,transparent),transparent 74%);opacity:0;transition:opacity .3s ease}
+.credentials-column li.is-spotlit::after{opacity:1}
+.credentials-column li:hover{z-index:2;background:color-mix(in srgb,var(--surface) 80%,transparent);border-color:var(--accent);box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 35%,transparent),0 18px 42px color-mix(in srgb,var(--accent) 15%,transparent)}
+.credentials-column li::before{position:relative;z-index:1;color:var(--accent);font-size:13px;font-weight:600;letter-spacing:-.01em}
+.credentials-column li .credential-copy{position:relative;z-index:1;display:grid;gap:4px;min-width:0}
+.credentials-column li .credential-title{display:block;line-height:1.4}
+.credentials-column li .credential-meta{display:block;color:var(--muted);font-size:12px;font-weight:400;letter-spacing:0;line-height:1.4}
+.credential-source{margin:0;padding:23px 10px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.credential-source a{color:var(--text);border-bottom:1px solid var(--accent);padding-bottom:2px}
+.credential-source a:hover{color:var(--accent)}
+.credentials-column ol[hidden]{display:none}
+@media(max-width:960px){.credentials-column{grid-template-columns:1fr;gap:20px;padding:36px 0}.credential-head p{max-width:none}.credentials-column h2{margin:10px 0 8px}}
+@media(max-width:620px){.credentials-column ol,.credentials-column .achievement-list{grid-template-columns:1fr}.credentials-column li,.credentials-column .achievement-list li{min-height:82px}.credential-source{padding-left:0;padding-right:0}}
+@media(hover:none),(pointer:coarse){.credentials-column::after,.credentials-column li::after{display:none}}
+@media(max-width:600px){.project-grid{grid-template-columns:1fr;gap:24px}.glass-selected .project-caption{padding:20px}.glass-selected .project-open{opacity:1;transform:none;right:12px;bottom:12px;font-size:12px}.glass-selected .image-label{left:12px;bottom:12px;font-size:9px}.glass-selected .brand-name{font-size:55px}.glass-selected .brand-name em{font-size:42px}.glass-selected .brand{padding:20px}}
+@media(prefers-reduced-motion:reduce){.credentials-column::after,.credentials-column li::after{display:none}.credentials-column h2 em,.credentials-column li{transition:none}.glass-selected:hover .project-image img{transform:none}}
+/* Use spacing and surface contrast for grouping; keep borders for active states. */
+.page-intro,.hero-foot,.site-footer,.home-index,.home-index>a+a,.page-about .stack-section,.page-about .credentials{border:0}
+.stack-grid{border:0}
+.stack-grid::before{display:none}
+.stack-group+.stack-group{border:0}
+.stack-group li,.tool-mark,.credentials-column li,.credentials-column li:last-child,.glass-selected{border-color:transparent}
+.tool-mark{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.credentials-column,.credential-source{border-top:0}
+.credentials-column li:hover,.credentials-column li:focus-visible{border-color:color-mix(in srgb,var(--accent) 70%,transparent)}
+.home-index{border:0}
+@media(max-width:760px){.stack-group+.stack-group,.home-index>a+a{border-top:0}}
+/* Earlier roles and later competition phases unfold on hover and focus. */
+.credentials-column li.credential-role-history{width:100%;transition:width .42s cubic-bezier(.2,.8,.2,1),background-color .25s ease,border-color .25s ease,box-shadow .3s ease}
+.credentials-column li.credential-role-history:hover,.credentials-column li.credential-role-history:focus-visible{width:calc(100% + 4px)}
+.credential-role-history .credential-copy{padding-right:27px}
+.credential-role-toggle{position:absolute;top:-5px;right:-1px;z-index:2;display:grid;place-items:center;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font:20px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;cursor:pointer;transition:background-color .25s ease,color .25s ease,transform .35s cubic-bezier(.2,.8,.2,1)}
+.credential-role-toggle:hover,.credential-role-toggle:focus-visible{background:var(--accent);color:var(--bg);outline:2px solid var(--accent);outline-offset:3px}
+.credential-copy.is-expanded .credential-role-toggle{transform:rotate(45deg)}
+.credential-role-reveal{display:grid;gap:3px;max-height:0;overflow:hidden;opacity:0;transform:translateY(-8px);transition:max-height .45s cubic-bezier(.2,.8,.2,1),opacity .28s ease,transform .45s ease,padding-top .45s ease}
+.credential-role-title{color:var(--text);font-size:14px;font-weight:600;line-height:1.4}
+.credential-role-date{color:var(--muted);font-size:12px;font-weight:400;line-height:1.4}
+.credential-role-history:focus-visible .credential-role-reveal,.credential-copy.is-expanded .credential-role-reveal{max-height:90px;padding-top:11px;opacity:1;transform:translateY(0)}
+@media(hover:hover) and (pointer:fine){.credential-role-history:hover .credential-role-reveal{max-height:90px;padding-top:11px;opacity:1;transform:translateY(0)}.credential-role-history:hover .credential-role-toggle{transform:rotate(45deg)}}
+@media(max-width:620px),(hover:none){.credentials-column li.credential-role-history:hover,.credentials-column li.credential-role-history:focus-visible{width:100%}}
+@media(prefers-reduced-motion:reduce){.credentials-column li.credential-role-history,.credential-role-reveal,.credential-role-toggle{transition:none}}
+
+/* Compact logo cards with a useful note beneath each tool. */
+.stack-group h3{margin-bottom:9px}
+.stack-group-description{min-height:38px;max-width:34ch;margin:0 0 21px;color:var(--muted);font-size:12px;line-height:1.6}
+.stack-group li{min-height:156px;padding:16px;background:color-mix(in srgb,var(--surface) 59%,transparent);border-radius:12px;display:flex;flex-direction:column;align-items:flex-start}
+.stack-group li::after{display:none}
+.tool-mark{display:flex;align-items:center;justify-content:center;gap:2px;width:48px;height:48px;flex:none;border:0;border-radius:11px;background:color-mix(in srgb,var(--accent) 11%,transparent);color:var(--accent)}
+.tool-logo{display:block;width:25px;height:25px;flex:none;background:currentColor;-webkit-mask:var(--logo) center/contain no-repeat;mask:var(--logo) center/contain no-repeat}
+.tool-logo-duo{width:19px;height:19px}
+.tool-brand-image{display:block;width:42px;height:42px;object-fit:contain;border-radius:7px}
+.tool-indexeddb-image{width:29px;height:29px}
+.tool-custom-icon{width:27px;height:27px;flex:none}
+.tool-symbol{font-family:Georgia,serif;font-size:28px;line-height:1}
+.tool-name{margin-top:13px;font-size:13px;font-weight:600;max-width:100%}
+.tool-description{display:block;margin-top:5px;color:var(--muted);font-size:11px;line-height:1.45;max-width:100%;text-wrap:balance}
+.tool-tick{right:15px;top:14px}
+@media(hover:hover) and (pointer:fine){.stack-group li:hover{background:color-mix(in srgb,var(--accent) 8%,var(--surface));border-color:transparent;box-shadow:0 12px 32px color-mix(in srgb,var(--accent) 9%,transparent)}.stack-group li:hover .tool-mark{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}}
+@media(max-width:1000px){.stack-group li{min-height:144px}.stack-group-description{min-height:0}}
+@media(max-width:760px){.stack-group-description{margin-bottom:14px}.stack-group li{min-height:148px}.tool-name{font-size:13px}}
+@media(max-width:380px){.stack-group ul{grid-template-columns:1fr 1fr;gap:7px}.stack-group li{padding:12px}.tool-description{font-size:10px}}

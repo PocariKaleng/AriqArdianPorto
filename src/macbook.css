@@ -1,0 +1,229 @@
+@import "tailwindcss/theme.css";
+@import "tailwindcss/utilities.css" source(none);
+@source "../components/ui/animated-3d-mac-book-air.tsx";
+
+/* Component utilities deliberately omit Tailwind preflight to preserve the portfolio. */
+.page-about .page-intro { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:48px; align-items:center; }
+.page-about .page-intro h1 { max-width:760px; font-size:clamp(58px,6.4vw,94px); }
+.macbook-showcase { margin:0; min-width:0; }
+.macbook-scene { position:relative; width:100%; height:280px; isolation:isolate; }
+.macbook-container { perspective:500px; transform:scale(1.65); }
+.macbook-inner, .macbook-screen, .macbook-body, .macbook-body-face-one, .macbook-keyboard { transform-style:preserve-3d; }
+.macbook-inner { transform:rotateX(-20deg); }
+.macbook-screen, .macbook-body { transform-origin:50% 100%; }
+.macbook-screen-face-one { transform:translateZ(2px); }
+.macbook-body { transform:rotateX(-90deg); }
+.macbook-body-face-one, .macbook-key { transform:translateZ(-2px); }
+.macbook-shadow { transform:rotateX(80deg); opacity:.65; }
+.custom-animate-rotate { animation:macbook-rotate 12s ease-in-out infinite; }
+.custom-animate-lid-screen { animation:macbook-lid-screen 12s ease-in-out infinite; }
+.custom-animate-lid-macbody { animation:macbook-lid-body 12s ease-in-out infinite; }
+.custom-animate-lid-keyboard-area { animation:macbook-keyboard-area 12s ease-in-out infinite; }
+.custom-animate-screen-shade { animation:macbook-screen-shade 12s ease-in-out infinite; }
+.custom-animate-keys { animation:macbook-keys 12s ease-in-out infinite; }
+.custom-animate-macbook-shadow { animation:macbook-shadow-animation 12s ease-in-out infinite; }
+.macbook-showcase[data-running="false"] .macbook-container * { animation-play-state:paused; }
+.macbook-caption { display:flex; align-items:center; justify-content:center; gap:20px; min-height:32px; color:var(--muted); }
+.macbook-caption>span { font:10px ui-monospace,monospace; letter-spacing:1px; }
+.macbook-motion-toggle { display:inline-flex; align-items:center; gap:6px; padding:8px; font:inherit; font-size:12px; color:var(--muted); background:none; border:0; border-radius:6px; }
+.macbook-motion-toggle:hover, .macbook-motion-toggle:focus-visible { color:var(--accent); }
+@media(max-width:1000px) {
+  .page-about .page-intro { grid-template-columns:minmax(0,1fr) 270px; gap:24px; }
+  .page-about .page-intro h1 { font-size:clamp(48px,7vw,72px); }
+  .macbook-container { transform:scale(1.45); }
+  .macbook-scene { height:240px; }
+}
+@media(max-width:720px) {
+  .page-about .page-intro { grid-template-columns:1fr; gap:20px; }
+  .page-about .page-intro h1 { font-size:clamp(43px,10vw,66px); }
+  #about-macbook { width:100%; max-width:340px; justify-self:center; }
+  .macbook-container { transform:scale(1.45); }
+  .macbook-scene { height:220px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .macbook-container * { animation:none !important; }
+  .macbook-inner { transform:rotateX(-20deg) rotateY(-25deg); }
+  .macbook-screen { transform:rotateX(-10deg); }
+}
+
+
+@keyframes macbook-rotate {
+  0% {
+    transform: rotateX(-20deg) rotateY(0deg) rotateZ(0deg);
+  }
+  5% {
+    transform: rotateX(-20deg) rotateY(-20deg) rotateZ(0deg);
+  }
+  20% {
+    transform: rotateX(30deg) rotateY(200deg) rotateZ(0deg);
+  }
+  25% {
+    transform: rotateX(-60deg) rotateY(150deg) rotateZ(0deg);
+  }
+  60% {
+    transform: rotateX(-20deg) rotateY(130deg) rotateZ(0deg);
+  }
+  65% {
+    transform: rotateX(-20deg) rotateY(120deg) rotateZ(0deg);
+  }
+  80% {
+    transform: rotateX(-20deg) rotateY(375deg) rotateZ(0deg);
+  }
+  85% {
+    transform: rotateX(-20deg) rotateY(357deg) rotateZ(0deg);
+  }
+  87% {
+    transform: rotateX(-20deg) rotateY(360deg) rotateZ(0deg);
+  }
+  100% {
+    transform: rotateX(-20deg) rotateY(360deg) rotateZ(0deg);
+  }
+}
+
+@keyframes macbook-lid-screen {
+  0% {
+    transform: rotateX(0deg);
+    background-position: left bottom;
+  }
+  5% {
+    transform: rotateX(50deg);
+    background-position: left bottom;
+  }
+  20% {
+    transform: rotateX(-90deg);
+    background-position: -150px top;
+  }
+  25% {
+    transform: rotateX(15deg);
+    background-position: left bottom;
+  }
+  30% {
+    transform: rotateX(-5deg);
+    background-position: right top;
+  }
+  38% {
+    transform: rotateX(5deg);
+    background-position: right top;
+  }
+  48% {
+    transform: rotateX(0deg);
+    background-position: right top;
+  }
+  90% {
+    transform: rotateX(0deg);
+    background-position: right top;
+  }
+  100% {
+    transform: rotateX(0deg);
+    background-position: right center;
+  }
+}
+
+@keyframes macbook-lid-body {
+  0% {
+    transform: rotateX(-90deg);
+  }
+  50% {
+    transform: rotateX(-90deg);
+  }
+  100% {
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes macbook-keyboard-area {
+  0% {
+    background-color: #dfdfdf;
+  }
+  50% {
+    background-color: #bbb;
+  }
+  100% {
+    background-color: #dfdfdf;
+  }
+}
+
+@keyframes macbook-screen-shade {
+  0% {
+    background-position: -20px 0px;
+  }
+  5% {
+    background-position: -40px 0px;
+  }
+  20% {
+    background-position: 200px 0;
+  }
+  50% {
+    background-position: -200px 0;
+  }
+  80% {
+    background-position: 0px 0px;
+  }
+  85% {
+    background-position: -30px 0;
+  }
+  90% {
+    background-position: -20px 0;
+  }
+  100% {
+    background-position: -20px 0px;
+  }
+}
+
+@keyframes macbook-keys {
+  0% {
+    box-shadow: 0 -2px 0 #222;
+  }
+  5% {
+    box-shadow: 1px -1px 0 #222;
+  }
+  20% {
+    box-shadow: -1px 1px 0 #222;
+  }
+  25% {
+    box-shadow: -1px 1px 0 #222;
+  }
+  60% {
+    box-shadow: -1px 1px 0 #222;
+  }
+  80% {
+    box-shadow: 0 -2px 0 #222;
+  }
+  85% {
+    box-shadow: 0 -2px 0 #222;
+  }
+  87% {
+    box-shadow: 0 -2px 0 #222;
+  }
+  100% {
+    box-shadow: 0 -2px 0 #222;
+  }
+}
+
+@keyframes macbook-shadow-animation {
+  0% {
+    transform: rotateX(80deg) rotateY(0deg) rotateZ(0deg);
+    box-shadow: 0 0 60px 40px rgba(0,0,0,0.3);
+  }
+  5% {
+    transform: rotateX(80deg) rotateY(10deg) rotateZ(0deg);
+    box-shadow: 0 0 60px 40px rgba(0,0,0,0.3);
+  }
+  20% {
+    transform: rotateX(30deg) rotateY(-20deg) rotateZ(-20deg);
+    box-shadow: 0 0 50px 30px rgba(0,0,0,0.3);
+  }
+  25% {
+    transform: rotateX(80deg) rotateY(-20deg) rotateZ(50deg);
+    box-shadow: 0 0 35px 15px rgba(0,0,0,0.1);
+  }
+  60% {
+    transform: rotateX(80deg) rotateY(0deg) rotateZ(-50deg) translateX(30px);
+    box-shadow: 0 0 60px 40px rgba(0,0,0,0.3);
+  }
+  100% {
+    transform: rotateX(80deg) rotateY(0deg) rotateZ(0deg);
+    box-shadow: 0 0 60px 40px rgba(0,0,0,0.3);
+  }
+}
+

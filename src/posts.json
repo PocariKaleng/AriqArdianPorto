@@ -1,0 +1,201 @@
+{
+  "posts": [
+    {
+      "href": "writeups/gcw-2-quals.pdf",
+      "title": "GCW 2.0 — Qualifiers",
+      "tags": [
+        "CTF",
+        "Quals"
+      ],
+      "readTime": "233 pages",
+      "date": "Competition writeup",
+      "excerpt": "Challenge solutions and notes from GCW 2.0 — Qualifiers.",
+      "image": "assets/covers/gcw-2-quals.jpg",
+      "action": "Read PDF"
+    },
+    {
+      "href": "writeups/gcw-2-finals.pdf",
+      "title": "GCW 2.0 — Finals",
+      "tags": [
+        "CTF",
+        "Finals"
+      ],
+      "readTime": "24 pages",
+      "date": "Competition writeup",
+      "excerpt": "Challenge solutions and notes from GCW 2.0 — Finals.",
+      "image": "assets/covers/gcw-2-finals.jpg",
+      "action": "Read PDF"
+    },
+    {
+      "href": "writeups/hacktoday-quals.pdf",
+      "title": "HackToday — Qualifiers",
+      "tags": [
+        "CTF",
+        "Quals"
+      ],
+      "readTime": "66 pages",
+      "date": "Competition writeup",
+      "excerpt": "Challenge solutions and notes from HackToday — Qualifiers.",
+      "image": "assets/covers/hacktoday-quals.jpg",
+      "action": "Read PDF"
+    },
+    {
+      "href": "writeups/ifest-2026-quals.pdf",
+      "title": "IFEST 2026 — Qualifiers",
+      "tags": [
+        "CTF",
+        "Quals"
+      ],
+      "readTime": "145 pages",
+      "date": "Competition writeup",
+      "excerpt": "Challenge solutions and notes from IFEST 2026 — Qualifiers.",
+      "image": "assets/covers/ifest-2026-quals.jpg",
+      "action": "Read PDF"
+    },
+    {
+      "href": "writeups/itfest-2026-quals.pdf",
+      "title": "ITFEST 2026 — Qualifiers",
+      "tags": [
+        "CTF",
+        "Quals"
+      ],
+      "readTime": "83 pages",
+      "date": "Competition writeup",
+      "excerpt": "Challenge solutions and notes from ITFEST 2026 — Qualifiers.",
+      "image": "assets/covers/itfest-2026-quals.jpg",
+      "action": "Read PDF"
+    },
+    {
+      "href": "writeups/compfest-18-quals.pdf",
+      "title": "COMPFEST 18 — Qualifiers",
+      "tags": [
+        "CTF",
+        "Quals"
+      ],
+      "readTime": "76 pages",
+      "date": "Competition writeup",
+      "excerpt": "Challenge solutions and notes from COMPFEST 18 — Qualifiers.",
+      "image": "assets/covers/compfest-18-quals.jpg",
+      "action": "Read PDF"
+    },
+    {
+      "href": "writeups/gemastik-quals.pdf",
+      "title": "GEMASTIK — Qualifiers",
+      "tags": [
+        "CTF",
+        "Quals"
+      ],
+      "readTime": "100 pages",
+      "date": "Competition writeup",
+      "excerpt": "Challenge solutions and notes from GEMASTIK — Qualifiers.",
+      "image": "assets/covers/gemastik-quals.jpg",
+      "action": "Read PDF"
+    },
+    {
+      "href": "writeups/ara-7-quals.pdf",
+      "title": "ARA 7.0 — Qualifiers",
+      "tags": [
+        "CTF",
+        "Quals"
+      ],
+      "readTime": "127 pages",
+      "date": "Competition writeup",
+      "excerpt": "Challenge solutions and notes from ARA 7.0 — Qualifiers.",
+      "image": "assets/covers/ara-7-quals.jpg",
+      "action": "Read PDF"
+    },
+    {
+      "href": "writeups/ara-7-finals.pdf",
+      "title": "ARA 7.0 — Finals",
+      "tags": [
+        "CTF",
+        "Finals"
+      ],
+      "readTime": "74 pages",
+      "date": "Competition writeup",
+      "excerpt": "Challenge solutions and notes from ARA 7.0 — Finals.",
+      "image": "assets/covers/ara-7-finals.jpg",
+      "action": "Read PDF"
+    },
+    {
+      "href": "writeups/cbd-national.pdf",
+      "title": "CBD National",
+      "tags": [
+        "CTF",
+        "National"
+      ],
+      "readTime": "119 pages",
+      "date": "Competition writeup",
+      "excerpt": "Challenge solutions and notes from CBD National.",
+      "image": "assets/covers/cbd-national.jpg",
+      "action": "Read PDF"
+    },
+    {
+      "href": "writeups/findit-2026-quals.pdf",
+      "title": "FindIT 2026 — Qualifiers",
+      "tags": [
+        "CTF",
+        "Quals"
+      ],
+      "readTime": "84 pages",
+      "date": "Competition writeup",
+      "excerpt": "Challenge solutions and notes from FindIT 2026 — Qualifiers.",
+      "image": "assets/covers/findit-2026-quals.jpg",
+      "action": "Read PDF"
+    }
+  ],
+  "extras": [
+    {
+      "href": "https://github.com/PocariKaleng/Minecraft-Skin-Finder",
+      "title": "Minecraft Skin Finder",
+      "tags": [
+        "Web App"
+      ],
+      "readTime": "JavaScript",
+      "date": "Projects & notes",
+      "excerpt": "Explore the source of my Minecraft skin finder.",
+      "image": "assets/explore/minecraft-skin-finder.png",
+      "imagePosition": "center top",
+      "action": "Explore"
+    },
+    {
+      "href": "https://hackmd.io/@AriqArdian",
+      "title": "HackMD notes",
+      "tags": [
+        "Writing"
+      ],
+      "readTime": "@AriqArdian",
+      "date": "Projects & notes",
+      "excerpt": "Read my technical notes and writeups on HackMD.",
+      "image": "assets/explore/hackmd-profile.png",
+      "imagePosition": "left center",
+      "action": "Explore"
+    },
+    {
+      "href": "https://cryptohack.org/user/afrdian/",
+      "title": "CryptoHack profile",
+      "tags": [
+        "Challenges"
+      ],
+      "readTime": "afrdian",
+      "date": "Projects & notes",
+      "excerpt": "Follow my cryptography challenge profile on CryptoHack.",
+      "image": "assets/explore/cryptohack-profile.png",
+      "imagePosition": "center top",
+      "action": "Explore"
+    },
+    {
+      "href": "https://github.com/PocariKaleng",
+      "title": "View all repositories",
+      "tags": [
+        "Github"
+      ],
+      "readTime": "@PocariKaleng",
+      "date": "Projects & notes",
+      "excerpt": "Browse my open-source projects on GitHub.",
+      "image": "assets/explore/github-repositories.png",
+      "imagePosition": "center top",
+      "action": "Explore"
+    }
+  ]
+}
