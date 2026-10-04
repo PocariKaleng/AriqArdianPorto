@@ -9,7 +9,7 @@ import { TableKit } from '@tiptap/extension-table';
 import { InlineMath, BlockMath } from '@tiptap/extension-mathematics';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { Bold, Italic, Code2, Link2, List, ListOrdered, Quote, Undo2, Redo2, Plus, ChevronDown, Sigma, ImagePlus, Table2, Heading2, X, Copy } from 'lucide-react';
-import { syntax, codeLanguages } from './syntax';
+import { syntax, codeLanguages, codeLanguage } from './syntax';
 import { normalizeLatex } from './MarkdownEditor';
 import { Article } from './Article';
 
@@ -17,7 +17,7 @@ function CodeView({ node, updateAttributes }: NodeViewProps) {
   const [copied, setCopied] = useState(false);
   return <NodeViewWrapper className="write-code-block"><div className="write-code-topbar" contentEditable={false}>
     <select aria-label="Code block language" value={node.attrs.language || 'plaintext'} onChange={event => updateAttributes({ language: event.target.value })}>
-      {!codeLanguages.some(([value]) => value === node.attrs.language) && node.attrs.language && <option value={node.attrs.language}>{node.attrs.language}</option>}
+      {!codeLanguages.some(([value]) => value === node.attrs.language) && node.attrs.language && <option value={node.attrs.language}>{codeLanguage(node.attrs.language)}</option>}
       {codeLanguages.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
     </select><button title="Copy code" aria-label="Copy code block" onClick={async () => { try { await navigator.clipboard.writeText(node.textContent); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { setCopied(false); } }}><Copy size={13} />{copied ? 'Copied' : 'Copy'}</button>
   </div><pre><NodeViewContent<'code'> as="code" /></pre></NodeViewWrapper>;

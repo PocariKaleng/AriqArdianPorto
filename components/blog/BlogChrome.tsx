@@ -1,16 +1,24 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { Sun, Moon, ArrowUpRight } from 'lucide-react';
+import { useSyncExternalStore } from 'react';
+import { Sun, Moon } from 'lucide-react';
+
+function subscribeTheme(onChange: () => void) {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  return () => observer.disconnect();
+}
+function isLightTheme() { return document.documentElement.dataset.theme === 'light'; }
+function serverTheme() { return false; }
+
 export function BlogHeader({ basePath = '/', staticSite = false }: { basePath?: string; staticSite?: boolean } = {}) {
-  const [light, setLight] = useState(false);
-  useEffect(() => { setLight(document.documentElement.dataset.theme === 'light'); }, []);
+  const light = useSyncExternalStore(subscribeTheme, isLightTheme, serverTheme);
   return <><a className="skip" href="#main">Skip to content</a><header className="shell site-header"><div className="header-capsule">
     <a className="wordmark" href={`${basePath}index.html`} aria-label="Ariq Ardian home"><span>Ariq Ardian</span></a>
     <nav aria-label="Main navigation"><a href={`${basePath}work.html`}>Work</a><a href={`${basePath}writeups.html`}>Write Up</a><a href={`${basePath}blog${staticSite ? '/' : ''}`} aria-current="page">Blog</a><a href={`${basePath}about.html`}>About</a></nav>
     <div className="header-actions"><button className="theme-toggle" aria-label={`Switch to ${light ? 'dark' : 'light'} mode`} onClick={() => {
-      const next = !light; setLight(next); document.documentElement.dataset.theme = next ? 'light' : 'dark';
-      try { localStorage.setItem('portfolio-theme', next ? 'light' : 'dark'); } catch { /* Theme still works without browser storage. */ }
-    }}>{staticSite ? <span className="theme-icon" aria-hidden="true">☼</span> : light ? <Moon size={18} /> : <Sun size={18} />}</button><a className="contact-nav" href={`${basePath}contact.html`}><span className="contact-text">Let’s Talk</span><ArrowUpRight size={15} /></a></div>
+      const next = isLightTheme() ? 'dark' : 'light'; document.documentElement.dataset.theme = next;
+      try { localStorage.setItem('portfolio-theme', next); } catch { /* Theme still works without browser storage. */ }
+    }}>{staticSite ? <span className="theme-icon" aria-hidden="true">☼</span> : light ? <Moon size={18} /> : <Sun size={18} />}</button><a className="contact-nav" href={`${basePath}contact.html`}><span className="contact-text">Contact</span></a></div>
   </div></header></>;
 }
 export function BlogFooter({ basePath = '/' }: { basePath?: string } = {}) {

@@ -30,7 +30,8 @@ Database dan gambar asli editor ada di `.wrangler/state/`, terpisah dari file ar
 
 - **Write** untuk menulis dengan toolbar dan menu `/`; **Markdown**, **Split**, dan **Preview** memakai isi yang sama.
 - Gambar unggahan: PNG, JPEG, GIF, WebP, maksimal 8 MiB per gambar.
-- Kode Python, Solidity, JavaScript, dan bahasa lain tetap mendapat syntax highlighting.
+- Kode Python, SageMath, Solidity, JavaScript, dan bahasa lain mendapat syntax highlighting. Untuk SageMath, pilih **SageMath** di editor atau gunakan penanda `sage` / `sagemath` di Markdown.
+- Blok kode artikel memakai nomor baris dan jarak baris yang lebih rapat. Tombol **Copy** menyalin kode beserta indentasinya tanpa nomor baris.
 - LaTeX `$...$` dan `$$...$$` dirender; klik persamaan untuk menyalin sumber LaTeX.
 - **Save draft** menyimpan tulisan pribadi. **Publish** menandai artikel agar masuk ekspor. **Update article** menyimpan revisi artikel Published. Ctrl/Cmd+S menyimpan dengan status saat ini.
 - **Publish di editor lokal belum memperbarui website online.** Perubahan, penghapusan, dan unpublish baru muncul online setelah ekspor ulang dan deployment berhasil.

@@ -21,7 +21,7 @@ export function renderBlog(posts: PublishedPost[], post: PublishedPost | undefin
     <meta property="og:type" content={post ? 'article' : 'website'} /><meta property="og:title" content={title} /><meta property="og:description" content={description} />
     {canonical && <><link rel="canonical" href={canonical} /><meta property="og:url" content={canonical} /></>}
     <script dangerouslySetInnerHTML={{ __html: themeInit }} />
-    {['style.css', 'silk.css', 'site-chrome.css', 'typography.css', 'notebook.css', 'katex/katex.min.css'].map(file => <link key={file} rel="stylesheet" href={`${basePath}${file}`} />)}
+    {['style.css', 'silk.css', 'navigation.css', 'site-chrome.css', 'typography.css', 'notebook.css', 'katex/katex.min.css'].map(file => <link key={file} rel="stylesheet" href={`${basePath}${file}`} />)}
     <script src={`${basePath}blog-runtime.js`} defer /><script src={`${basePath}silk.js`} defer />
   </head><body><div className="page page-notebook"><BlogHeader basePath={basePath} staticSite />
     <main id="main" className="shell notebook-main"><div className="notebook-title"><div><span className="notebook-eyebrow">ARIQ’S NOTEBOOK</span><h1>{post ? 'Blog' : 'Blog.'}</h1>{!post && <p>{description}</p>}</div><a className="quiet-button" href={`${basePath}writeups.html`}><BookOpen size={15} />CTF Write Up <ArrowUpRight size={14} /></a></div>
