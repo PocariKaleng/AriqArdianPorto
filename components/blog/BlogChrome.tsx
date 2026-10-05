@@ -1,6 +1,7 @@
 'use client';
 import { useSyncExternalStore } from 'react';
 import { Sun, Moon } from 'lucide-react';
+import { SpecialText } from '@/components/ui/special-text';
 
 function subscribeTheme(onChange: () => void) {
   const observer = new MutationObserver(onChange);
@@ -13,7 +14,7 @@ function serverTheme() { return false; }
 export function BlogHeader({ basePath = '/', staticSite = false }: { basePath?: string; staticSite?: boolean } = {}) {
   const light = useSyncExternalStore(subscribeTheme, isLightTheme, serverTheme);
   return <><a className="skip" href="#main">Skip to content</a><header className="shell site-header"><div className="header-capsule">
-    <a className="wordmark" href={`${basePath}index.html`} aria-label="Ariq Ardian home"><span>Ariq Ardian</span></a>
+    <a className="wordmark" href={`${basePath}index.html`} aria-label="Ariq Ardian home"><span>{staticSite ? 'Ariq Ardian' : <SpecialText speed={20} delay={.15}>Ariq Ardian</SpecialText>}</span></a>
     <nav aria-label="Main navigation"><a href={`${basePath}work.html`}>Work</a><a href={`${basePath}writeups.html`}>Write Up</a><a href={`${basePath}blog${staticSite ? '/' : ''}`} aria-current="page">Blog</a><a href={`${basePath}about.html`}>About</a></nav>
     <div className="header-actions"><button className="theme-toggle" aria-label={`Switch to ${light ? 'dark' : 'light'} mode`} onClick={() => {
       const next = isLightTheme() ? 'dark' : 'light'; document.documentElement.dataset.theme = next;

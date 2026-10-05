@@ -23,7 +23,7 @@ export function renderBlog(posts: PublishedPost[], post: PublishedPost | undefin
     {canonical && <><link rel="canonical" href={canonical} /><meta property="og:url" content={canonical} /></>}
     <script dangerouslySetInnerHTML={{ __html: themeInit }} />
     {['style.css', 'silk.css', 'navigation.css', 'site-chrome.css', 'typography.css', 'notebook.css', 'katex/katex.min.css'].map(file => <link key={file} rel="stylesheet" href={`${basePath}${file}`} />)}
-    <script src={`${basePath}blog-runtime.js`} defer /><script src={`${basePath}silk.js`} defer />
+    <script src={`${basePath}blog-runtime.js`} defer /><script src={`${basePath}silk.js`} defer /><script src={`${basePath}navigation.js`} defer />
   </head><body><div className="page page-notebook"><BlogHeader basePath={basePath} staticSite />
     <main id="main" className="shell notebook-main"><div className="notebook-title"><div><span className="notebook-eyebrow">ARIQ’S NOTEBOOK</span><h1>{post ? 'Blog' : 'Blog.'}</h1>{!post && <p>{description}</p>}</div><a className="quiet-button" href={`${basePath}writeups.html`}><BookOpen size={15} />CTF Write Up <ArrowUpRight size={14} /></a></div>
       {post ? <div className="reader-layout"><aside className="reader-navigation"><a className="quiet-button" href={`${basePath}blog/`}><ArrowLeft size={14} />All articles</a><span className="sidebar-label">ON THIS PAGE</span><nav aria-label="Article contents">{outline(post.markdown).map(item => <a key={item.id} href={`#${item.id}`} className={item.level === 3 ? 'heading-nested' : ''}>{item.title}</a>)}</nav></aside>

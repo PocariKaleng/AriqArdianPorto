@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useInView } from "framer-motion";
 
 export interface SpecialTextProps {
   children: string;
@@ -23,10 +22,21 @@ function getRandomChar(previous?: string) {
 
 export function SpecialText({ children, speed = 20, delay = 0, className = "", inView = false, once = true }: SpecialTextProps) {
   const container = useRef<HTMLSpanElement>(null);
-  const visible = useInView(container, { once, margin: "-100px" });
+  const [visible, setVisible] = useState(false);
   const shouldAnimate = !inView || visible;
   const [displayText, setDisplayText] = useState(children);
   const [reduced, setReduced] = useState(() => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  useEffect(() => {
+    const element = container.current;
+    if (!inView || !element) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      setVisible(entry.isIntersecting);
+      if (entry.isIntersecting && once) observer.disconnect();
+    }, { rootMargin: '-100px' });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [inView, once]);
 
   useEffect(() => {
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
