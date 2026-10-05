@@ -1,12 +1,13 @@
 'use client';
 import { useState, useRef, useEffect, isValidElement, type ReactNode, type CSSProperties } from 'react';
-import type { RootContent } from 'hast';
+import type { RootContent, Element } from 'hast';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, ChevronRight } from 'lucide-react';
 import { syntax, codeLanguage } from './syntax';
+import { codeFilename } from './code-file';
 function coloredTokens(nodes: RootContent[]): ReactNode[] {
   return nodes.map((node, index) => node.type === 'text' ? node.value : node.type === 'element' ? <span key={index} className={Array.isArray(node.properties.className) ? node.properties.className.join(' ') : undefined}>{coloredTokens(node.children)}</span> : null);
 }
@@ -47,15 +48,17 @@ export function outline(markdown: string) {
   });
 }
 function CodeBlock({ children }: { children: ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null), [copied, setCopied] = useState(false);
-  const code = isValidElement<{ className?: string; children?: ReactNode }>(children) ? children.props : undefined;
+  const ref = useRef<HTMLDetailsElement>(null), [copied, setCopied] = useState(false);
+  const code = isValidElement<{ className?: string; children?: ReactNode; node?: Element }>(children) ? children.props : undefined;
   const language = code?.className?.match(/language-([\w+-]+)/)?.[1]?.toLowerCase();
+  const filename = codeFilename(String(code?.node?.data?.meta ?? ''));
   const text = String(code?.children ?? ''), trailingNewline = text.endsWith('\n');
   const lines = tokenLines(codeTokens(text, language));
   if (trailingNewline) lines.pop();
-  return <div className="article-code" ref={ref}><span className="code-language-label">{codeLanguage(language || '')}</span><button className="copy-code" aria-label="Copy code" onClick={async () => {
+  return <details className="article-code" ref={ref} open><summary className="code-summary"><ChevronRight size={14} className="code-disclosure" aria-hidden="true" /><span className="code-heading">{filename && <span className="code-filename">{filename}</span>}<span className="code-language-label">{codeLanguage(language || '')}</span></span><button type="button" className="copy-code" aria-label={filename ? `Copy ${filename}` : 'Copy code'} onClick={async event => {
+    event.preventDefault(); event.stopPropagation();
     try { await navigator.clipboard.writeText(ref.current?.querySelector('code')?.textContent || ''); setCopied(true); setTimeout(() => setCopied(false), 1600); } catch { setCopied(false); }
-  }}>{copied ? <Check size={14} /> : <Copy size={14} />}{copied ? 'Copied' : 'Copy'}</button><pre><code className={code?.className} style={{ '--code-gutter-width': `${String(lines.length).length}ch` } as CSSProperties}>{lines.map((line, index) => <span key={index}><span className="code-line"><span className="code-line-number" aria-hidden="true" data-line={index + 1} /><span className="code-line-content">{coloredTokens(line)}</span></span>{index < lines.length - 1 || trailingNewline ? '\n' : null}</span>)}</code></pre></div>;
+  }}>{copied ? <Check size={14} /> : <Copy size={14} />}{copied ? 'Copied' : 'Copy'}</button></summary><pre><code className={code?.className} style={{ '--code-gutter-width': `${String(lines.length).length}ch` } as CSSProperties}>{lines.map((line, index) => <span key={index}><span className="code-line"><span className="code-line-number" aria-hidden="true" data-line={index + 1} /><span className="code-line-content">{coloredTokens(line)}</span></span>{index < lines.length - 1 || trailingNewline ? '\n' : null}</span>)}</code></pre></details>;
 }
 export function Article({ markdown, onMessage }: { markdown: string; onMessage?: (text: string) => void }) {
   const root = useRef<HTMLDivElement>(null);

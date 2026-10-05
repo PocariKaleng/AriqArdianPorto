@@ -75,7 +75,7 @@
 .article-body .image-caption { display:block; font-size:11px; color:var(--muted); text-align:center; margin-top:10px; }
 .article-body code,.markdown-help code { font-family:'JetBrainsMono NF','JetBrains Mono',monospace; font-size:.85em; background:color-mix(in srgb,var(--text) 6%,transparent); padding:3px 5px; border-radius:4px; }
 .article-code { --code-edge:color-mix(in srgb,var(--muted) 30%,transparent); position:relative; margin:24px 0; background:color-mix(in srgb,var(--bg) 92%,var(--text)); border:1px solid var(--code-edge); border-radius:8px; overflow:hidden; }
-.article-body pre { margin:0; padding:44px 20px 20px; overflow-x:auto; font:400 13px/1.6 'JetBrainsMono NF','JetBrains Mono',monospace; letter-spacing:0; tab-size:4; }
+.article-body pre { margin:0; padding:12px 20px 20px; overflow-x:auto; font:400 13px/1.6 'JetBrainsMono NF','JetBrains Mono',monospace; letter-spacing:0; tab-size:4; }
 .article-body pre code { display:block; padding:0; background:none; font:inherit; border-radius:0; white-space:pre; }
 .article-code pre code { white-space:normal; }
 .code-line { display:grid; grid-template-columns:calc(var(--code-gutter-width,2ch) + 16px + 1px) minmax(0,1fr); column-gap:20px; min-height:1.6em; }
@@ -147,7 +147,15 @@
 @media(prefers-reduced-motion:reduce) { .blog-loading span { animation:none; }.article-list-item,.primary-button,.secondary-button,.quiet-button { transition:none; } }
 
 /* A writing surface with document blocks, quiet controls, and a readable code palette. */
-.code-language-label { position:absolute; top:13px; left:20px; font:400 11px/1.3 'IBM Plex Sans',sans-serif; color:var(--muted); }
+.code-summary { display:flex; align-items:center; gap:10px; min-height:44px; padding:10px 88px 10px 20px; cursor:pointer; list-style:none; }
+.code-summary::-webkit-details-marker { display:none; }
+.code-summary:focus-visible { outline:2px solid var(--accent); outline-offset:-3px; border-radius:7px; }
+.code-disclosure { flex-shrink:0; color:var(--muted); }
+.article-code[open] .code-disclosure { transform:rotate(90deg); }
+.code-heading { display:flex; align-items:baseline; flex-wrap:wrap; gap:5px 12px; min-width:0; }
+.code-filename { font:500 12px/1.4 'JetBrainsMono NF','JetBrains Mono',monospace; overflow-wrap:anywhere; }
+.code-language-label { font:400 11px/1.3 'IBM Plex Sans',sans-serif; color:var(--muted); }
+@media(max-width:480px) { .code-summary { padding-left:12px; gap:7px; } }
 .page-notebook { --code-keyword:#c8a9f0; --code-string:#a6ce98; --code-number:#e7b486; --code-title:#93c7ec; --code-comment:#87919d; --code-built-in:#ead08e; }
 :root[data-theme=light] .page-notebook { --code-keyword:#8044a6; --code-string:#29713b; --code-number:#975526; --code-title:#246da0; --code-comment:#6b737f; --code-built-in:#865f12; }
 .page-notebook .hljs-keyword,.page-notebook .hljs-selector-tag,.page-notebook .hljs-type { color:var(--code-keyword); }
@@ -174,7 +182,13 @@
 .write-code-block { border-radius:8px; background:color-mix(in srgb,var(--bg) 92%,var(--text)); margin:24px 0; overflow:hidden; }
 .write-code-topbar { display:flex; justify-content:space-between; align-items:center; padding:10px 16px 0; gap:12px; }
 .write-code-topbar select { color:var(--muted); background:transparent; }
+.write-code-topbar .write-code-filename { flex:1; width:0; min-width:70px; padding:7px 8px; border:1px solid transparent; border-radius:4px; color:var(--text); background:transparent; font:400 11px/1.4 'JetBrainsMono NF','JetBrains Mono',monospace; }
+.write-code-filename::placeholder { color:var(--muted); }
+.write-code-topbar .write-code-filename:focus { border-color:var(--code-edge,var(--accent)); outline:none; }
 .write-code-topbar button { display:flex; align-items:center; gap:7px; padding:8px; color:var(--muted); background:none; border:0; font-size:10px; }
+.write-code-disclosure { flex-shrink:0; }
+.write-code-disclosure[aria-expanded=true] svg { transform:rotate(90deg); }
+.write-code-block pre[hidden] { display:none; }
 .write-code-block.ProseMirror-selectednode { outline:1px solid var(--accent); }
 .write-document .tiptap-mathematics-render { border-radius:5px; cursor:pointer; }
 .write-document .tiptap-mathematics-render:hover { background:color-mix(in srgb,var(--accent) 8%,transparent); }

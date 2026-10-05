@@ -8,25 +8,46 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { TableKit } from '@tiptap/extension-table';
 import { InlineMath, BlockMath } from '@tiptap/extension-mathematics';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
-import { Bold, Italic, Code2, Link2, List, ListOrdered, Quote, Undo2, Redo2, Plus, ChevronDown, Sigma, ImagePlus, Table2, Heading2, X, Copy } from 'lucide-react';
+import { Bold, Italic, Code2, Link2, List, ListOrdered, Quote, Undo2, Redo2, Plus, ChevronDown, ChevronRight, Sigma, ImagePlus, Table2, Heading2, X, Copy } from 'lucide-react';
 import { syntax, codeLanguages, codeLanguage } from './syntax';
 import { normalizeLatex } from './MarkdownEditor';
 import { Article } from './Article';
+import { codeFilename, codeFileMeta } from './code-file';
 
 function CodeView({ node, updateAttributes }: NodeViewProps) {
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(false), [folded, setFolded] = useState(false);
   return <NodeViewWrapper className="write-code-block"><div className="write-code-topbar" contentEditable={false}>
+    <button type="button" className="write-code-disclosure" aria-expanded={!folded} aria-label={`${folded ? 'Expand' : 'Collapse'} ${node.attrs.filename || 'code block'}`} onClick={() => setFolded(!folded)}><ChevronRight size={14} /></button>
     <select aria-label="Code block language" value={node.attrs.language || 'plaintext'} onChange={event => updateAttributes({ language: event.target.value })}>
       {!codeLanguages.some(([value]) => value === node.attrs.language) && node.attrs.language && <option value={node.attrs.language}>{codeLanguage(node.attrs.language)}</option>}
       {codeLanguages.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
-    </select><button title="Copy code" aria-label="Copy code block" onClick={async () => { try { await navigator.clipboard.writeText(node.textContent); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { setCopied(false); } }}><Copy size={13} />{copied ? 'Copied' : 'Copy'}</button>
-  </div><pre><NodeViewContent<'code'> as="code" /></pre></NodeViewWrapper>;
+    </select><input className="write-code-filename" aria-label="Code filename" placeholder="Filename, e.g. solver.sage" maxLength={160} value={node.attrs.filename || ''} onChange={event => updateAttributes({ filename: event.target.value })} /><button title="Copy code" aria-label="Copy code block" onClick={async () => { try { await navigator.clipboard.writeText(node.textContent); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { setCopied(false); } }}><Copy size={13} />{copied ? 'Copied' : 'Copy'}</button>
+  </div><pre hidden={folded}><NodeViewContent<'code'> as="code" /></pre></NodeViewWrapper>;
 }
-const ColoredCode = CodeBlockLowlight.extend({ addNodeView() { return ReactNodeViewRenderer(CodeView); } });
+export const ColoredCode = CodeBlockLowlight.extend({
+  addAttributes() {
+    return { ...this.parent?.(), filename: { default: '', parseHTML: element => element.getAttribute('data-filename') || '', renderHTML: attributes => attributes.filename ? { 'data-filename': attributes.filename } : {} }, meta: { default: '', rendered: false } };
+  },
+  parseMarkdown(token, helpers) {
+    const [language = '', ...parts] = (token.lang || '').split(/\s+/);
+    const meta = parts.join(' ');
+    return helpers.createNode('codeBlock', { language: language || null, filename: codeFilename(meta), meta }, token.text ? [helpers.createTextNode(token.text)] : []);
+  },
+  renderMarkdown(node, helpers) {
+    const meta = codeFileMeta(node.attrs?.meta || '', node.attrs?.filename || '');
+    const info = [node.attrs?.language || (meta ? 'plaintext' : ''), meta].filter(Boolean).join(' ');
+    const text = node.content ? helpers.renderChildren(node.content) : '';
+    const longestFence = Math.max(2, ...[...text.matchAll(/`+/g)].map(match => match[0].length));
+    const fence = '`'.repeat(longestFence + 1);
+    return `${fence}${info}\n${text}\n${fence}`;
+  },
+  addNodeView() { return ReactNodeViewRenderer(CodeView); },
+});
 export type WriteHandle = { insertMarkdown: (markdown: string) => void; insertImage: (src: string, alt: string) => void; openEquation: () => void };
 type MathEdit = { latex: string; inline: boolean; pos?: number };
 export const WriteEditor = forwardRef<WriteHandle, { value: string; onChange: (value: string) => void; onImages: (files: File[]) => void; onUpload: () => void; onMessage: (text: string) => void }>(({ value, onChange, onImages, onUpload, onMessage }, ref) => {
-  const callbacks = useRef({ onChange, onImages, onMessage }); callbacks.current = { onChange, onImages, onMessage };
+  const callbacks = useRef({ onChange, onImages, onMessage });
+  useEffect(() => { callbacks.current = { onChange, onImages, onMessage }; }, [onChange, onImages, onMessage]);
   const [menu, setMenu] = useState(false), [math, setMath] = useState<MathEdit | null>(null), [link, setLink] = useState<string | null>(null);
   const [code, setCode] = useState('python'), [, refreshToolbar] = useState(0);
   const mathDialog = useRef<HTMLDialogElement>(null), linkDialog = useRef<HTMLDialogElement>(null), blockMenu = useRef<HTMLDivElement>(null);

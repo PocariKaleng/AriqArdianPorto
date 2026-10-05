@@ -246,7 +246,7 @@ $$
 
 Sisa nya sih decrypt RSA biasa buat Recover nilai Secretnya , dan berikut Final solver script.
 Solver.sage
-```sage
+```sage filename="solver.sage"
 from sage.all import *
 from pwn import *
 

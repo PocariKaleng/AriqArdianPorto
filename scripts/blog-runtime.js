@@ -24,7 +24,8 @@
     try { localStorage.setItem('portfolio-theme', next); } catch { /* Theme works without storage. */ }
     themeLabel();
   });
-  document.querySelectorAll('.copy-code').forEach(button => button.addEventListener('click', async () => {
+  document.querySelectorAll('.copy-code').forEach(button => button.addEventListener('click', async event => {
+    event.preventDefault(); event.stopPropagation();
     if (await copy(button.closest('.article-code').querySelector('code').textContent)) {
       const label = button.innerHTML; button.textContent = 'Copied';
       setTimeout(() => { button.innerHTML = label; }, 1600);
