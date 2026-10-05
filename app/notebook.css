@@ -84,7 +84,7 @@
 .code-line-content { min-width:0; white-space:pre-wrap; overflow-wrap:anywhere; }
 .copy-code { display:flex; gap:6px; align-items:center; position:absolute; top:6px; right:12px; background:none; color:var(--muted); font-size:10px!important; border:0; padding:8px; }
 @media(max-width:480px) { .article-code pre { padding-inline:12px; }.code-line { column-gap:12px; } }
-.article-body .katex-display { overflow-x:auto; overflow-y:hidden; padding:16px 0; }
+.article-body .katex-display { margin:10px 0; overflow-x:auto; overflow-y:hidden; padding:4px 0; }
 .article-body .katex { cursor:copy; }
 .article-body .katex:hover { color:var(--accent); }
 .article-body table { display:block; max-width:100%; overflow-x:auto; border-collapse:collapse; font-size:14px; }
