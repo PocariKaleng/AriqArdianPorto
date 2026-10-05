@@ -17,6 +17,7 @@ export function renderBlog(posts: PublishedPost[], post: PublishedPost | undefin
   return '<!doctype html>\n' + renderToStaticMarkup(<html lang="en" data-theme="dark"><head>
     <meta charSet="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title><meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" sizes="any" href={`${basePath}favicon.svg?v=portrait-1`} />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta property="og:type" content={post ? 'article' : 'website'} /><meta property="og:title" content={title} /><meta property="og:description" content={description} />
     {canonical && <><link rel="canonical" href={canonical} /><meta property="og:url" content={canonical} /></>}

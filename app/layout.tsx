@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   title: "Ariq Ardian — Portfolio",
   description: "Cryptography, blockchain, and notes from the things I build.",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/favicon.svg?v=portrait-1",
+    shortcut: "/favicon.svg?v=portrait-1",
   },
 };
 
