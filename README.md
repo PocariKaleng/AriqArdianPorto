@@ -4,7 +4,7 @@
 
 Tulis artikel memakai editor web lokal. Artikel Published dan gambar unggahannya diekspor menjadi file di repository, lalu GitHub Actions membangun portfolio dan blog untuk GitHub Pages.
 
-![Preview artikel Acheron](docs/blog-preview.jpg)
+![Preview daftar Blog](docs/blog-index-preview.jpg)
 
 ## 1. Buka editor lokal
 
@@ -65,6 +65,14 @@ npm run preview:static
 ```
 
 Buka [preview website publik](http://127.0.0.1:4173/blog/). Artikel punya URL sendiri di `/blog/<slug>/`, pencarian, daftar isi, copy kode, copy LaTeX, dan tombol berbagi tautan. Work, About, Contact, dan koleksi PDF Write Up tetap ikut website.
+
+Daftar Blog memakai layout teks dan gambar berdampingan, dengan gambar di atas teks pada HP. Gambar pratinjau diambil dari gambar pertama artikel; judul, tag, penulis, dan tanggal berasal dari artikel yang tersimpan. Pencarian, filter Published/Drafts, serta tombol Edit tetap tersedia di editor lokal.
+
+About menampilkan timeline Experience dan Community. HOLOGY 9 menggabungkan Qualifiers dan Finals; Hack It Braw menggabungkan riwayat Member dan Leader beserta tanggal masing-masing.
+
+![Preview timeline About](docs/about-timeline-preview.jpg)
+
+[Preview isi artikel Acheron](docs/blog-preview.jpg)
 
 Untuk membangun ulang dari file yang sudah diekspor:
 

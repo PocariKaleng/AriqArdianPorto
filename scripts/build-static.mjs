@@ -4,12 +4,14 @@ import { pathToFileURL } from 'node:url';
 import { build } from 'vite';
 import { projectRoot, loadContent, copyArticleAssets } from './blog-content.mjs';
 import { mapMarkdownUrls, normalizeBase } from '../lib/blog-portable.mjs';
+import { buildHighlights } from './build-highlights.mjs';
 
 export async function buildStatic() {
   const basePath = normalizeBase(process.env.BLOG_BASE_PATH);
   const siteUrl = process.env.BLOG_SITE_URL;
   if (siteUrl && (!/^https:\/\//.test(siteUrl) || new URL(siteUrl).search || new URL(siteUrl).hash || new URL(siteUrl).username || new URL(siteUrl).password)) throw new Error('BLOG_SITE_URL harus URL HTTPS lengkap, termasuk subpath repository bila ada.');
   const posts = await loadContent();
+  await buildHighlights();
   const renderRoot = path.join(projectRoot, '.sites-runtime', `static-render-${crypto.randomUUID()}`);
   await build({ configFile: false, root: projectRoot, publicDir: false, logLevel: 'warn', build: {
     ssr: path.join(projectRoot, 'components/blog/StaticBlog.tsx'), outDir: renderRoot, emptyOutDir: false,

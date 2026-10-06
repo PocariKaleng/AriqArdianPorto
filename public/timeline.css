@@ -1,0 +1,18 @@
+.credentials-column > .timeline-mount { position:relative; z-index:1; min-width:0; }
+.credentials-column .about-timeline { position:relative; display:block; margin:0; padding:0 0 0 8px; list-style:none; counter-reset:none; }
+.about-timeline::before { content:""; position:absolute; top:12px; bottom:12px; left:14px; width:1px; background:color-mix(in srgb,var(--muted) 30%,transparent); }
+.credentials-column .about-timeline > li { position:relative; display:block; min-height:0; padding:0 0 28px 32px; border:0; border-radius:0; background:none; backdrop-filter:none; box-shadow:none; letter-spacing:normal; transition:none; }
+.credentials-column .about-timeline > li:last-child { padding-bottom:0; border:0; }
+.credentials-column .about-timeline > li::before,.credentials-column .about-timeline > li::after { content:none; }
+.timeline-dot { position:absolute; z-index:1; top:11px; left:2.5px; display:block; width:8px; height:8px; border:0; border-radius:50%; background:var(--accent); box-shadow:none; }
+.timeline-company { display:flex; align-items:center; gap:10px; margin-bottom:10px; color:var(--text); font-size:13px; font-weight:500; }
+.timeline-company-icon { display:grid; place-items:center; flex:none; width:30px; height:30px; border-radius:50%; background:color-mix(in srgb,var(--accent) 9%,transparent); color:var(--muted); }
+.about-timeline h3 { margin:0; color:var(--text); font-size:17px; font-weight:500; line-height:1.45; letter-spacing:-.2px; }
+.timeline-period { display:flex; align-items:center; gap:7px; margin-top:8px; color:var(--muted); font-size:12px; line-height:1.5; }
+.timeline-period svg { flex:none; }
+.timeline-description { margin:12px 0 0; color:var(--muted); font-size:14px; line-height:1.6; }
+.timeline-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.timeline-categories { display:flex; flex-wrap:wrap; gap:10px 20px; margin-top:12px; }
+.timeline-category { display:flex; flex-wrap:wrap; align-items:center; gap:7px; color:var(--muted); font-size:11px; line-height:1.5; }
+.about-timeline [data-slot="badge"] { display:inline-flex; align-items:center; padding:3px 9px; border:0; border-radius:999px; background:color-mix(in srgb,var(--accent) 9%,transparent); color:var(--muted); font-size:11px; font-weight:400; line-height:1.5; white-space:nowrap; }
+@media(max-width:620px) { .credentials-column .about-timeline > li { padding-left:28px; }.about-timeline h3 { font-size:16px; } }

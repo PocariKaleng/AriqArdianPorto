@@ -1,11 +1,12 @@
 import { db, isOwner, requireOwner, json, handle, BlogError, type Post } from '@/lib/blog';
+import { postPreview } from '@/components/blog/post-preview';
 export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   return handle(async () => {
     const drafts = new URL(request.url).searchParams.get('drafts') === '1';
     if (drafts && !await isOwner()) throw new BlogError('Akses draf tidak diizinkan.', 403);
-    const posts = await db().prepare(`SELECT id, slug, title, excerpt, tags, status, updated_at, published_at, revision FROM blog_posts ${drafts ? '' : "WHERE status = 'published'"} ORDER BY COALESCE(published_at, updated_at) DESC LIMIT 500`).all();
-    return json({ posts: posts.results });
+    const posts = await db().prepare(`SELECT id, slug, title, excerpt, tags, status, updated_at, published_at, revision, markdown FROM blog_posts ${drafts ? '' : "WHERE status = 'published'"} ORDER BY COALESCE(published_at, updated_at) DESC LIMIT 500`).all();
+    return json({ posts: posts.results.map(({ markdown, ...summary }) => ({ ...summary, ...postPreview(String(markdown)) })) });
   });
 }
 export async function POST(request: Request) {

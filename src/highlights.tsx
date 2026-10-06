@@ -2,6 +2,8 @@ import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { useId, useState } from "react";
 import { AnimatedList } from "../components/ui/animated-list";
+import Timeline from "../components/ui/timeline-01";
+import { credentialTimeline } from "./credential-timeline";
 
 const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -98,9 +100,17 @@ document.querySelectorAll<HTMLOListElement>(".credentials-column ol").forEach((o
   if (!entries.length) return;
 
   const mount = document.createElement("div");
-  mount.className = "achievement-mount";
+  const isTimeline = original.hasAttribute("data-timeline");
+  mount.className = isTimeline ? "timeline-mount" : "achievement-mount";
   original.hidden = true;
   original.after(mount);
+
+  if (isTimeline) {
+    const kind = original.getAttribute("data-timeline") === "community" ? "community" : "experience";
+    const items = credentialTimeline(entries, kind);
+    flushSync(() => createRoot(mount).render(<Timeline items={items} label={kind === "community" ? "Community timeline" : "Experience timeline"} />));
+    return;
+  }
 
   flushSync(() => {
     createRoot(mount).render(

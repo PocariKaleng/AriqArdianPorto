@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useEffect, isValidElement, type ReactNode, type CSSProperties } from 'react';
-import type { RootContent, Element } from 'hast';
+import type { ElementContent, Element as HastElement } from 'hast';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -8,18 +8,18 @@ import rehypeKatex from 'rehype-katex';
 import { Copy, Check, ChevronRight } from 'lucide-react';
 import { syntax, codeLanguage } from './syntax';
 import { codeFilename } from './code-file';
-function coloredTokens(nodes: RootContent[]): ReactNode[] {
+function coloredTokens(nodes: ElementContent[]): ReactNode[] {
   return nodes.map((node, index) => node.type === 'text' ? node.value : node.type === 'element' ? <span key={index} className={Array.isArray(node.properties.className) ? node.properties.className.join(' ') : undefined}>{coloredTokens(node.children)}</span> : null);
 }
-function codeTokens(text: string, language?: string): RootContent[] {
+function codeTokens(text: string, language?: string): ElementContent[] {
   if (language && syntax.registered(language) && text.length < 100_000) {
-    try { return syntax.highlight(language, text).children; } catch { /* Unknown or malformed syntax stays readable. */ }
+    try { return syntax.highlight(language, text).children.filter((node): node is ElementContent => node.type !== 'doctype'); } catch { /* Unknown or malformed syntax stays readable. */ }
   }
   return [{ type: 'text', value: text }];
 }
 // Split highlighted tokens after parsing, preserving multiline strings and comments.
-function tokenLines(nodes: RootContent[]): RootContent[][] {
-  const lines: RootContent[][] = [[]];
+function tokenLines(nodes: ElementContent[]): ElementContent[][] {
+  const lines: ElementContent[][] = [[]];
   for (const node of nodes) {
     if (node.type === 'text') {
       node.value.split('\n').forEach((value, index) => {
@@ -49,7 +49,7 @@ export function outline(markdown: string) {
 }
 function CodeBlock({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDetailsElement>(null), [copied, setCopied] = useState(false);
-  const code = isValidElement<{ className?: string; children?: ReactNode; node?: Element }>(children) ? children.props : undefined;
+  const code = isValidElement<{ className?: string; children?: ReactNode; node?: HastElement }>(children) ? children.props : undefined;
   const language = code?.className?.match(/language-([\w+-]+)/)?.[1]?.toLowerCase();
   const filename = codeFilename(String(code?.node?.data?.meta ?? ''));
   const text = String(code?.children ?? ''), trailingNewline = text.endsWith('\n');

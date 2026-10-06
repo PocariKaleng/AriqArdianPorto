@@ -2,7 +2,7 @@ export type BlogPost = {
   id: string; slug: string; title: string; excerpt: string; markdown: string; tags: string;
   status: 'draft' | 'published'; updated_at: string; published_at: string | null; revision: number;
 };
-export type Summary = Omit<BlogPost, 'markdown'>;
+export type Summary = Omit<BlogPost, 'markdown'> & { preview_image?: string; preview_alt?: string };
 export async function api<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(path, { ...options, headers: { ...(options?.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }), ...options?.headers } });
   const data: unknown = await response.json();

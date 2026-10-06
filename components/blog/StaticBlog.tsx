@@ -3,6 +3,8 @@ import { ArrowUpRight, ArrowLeft, BookOpen, Search, Copy, Download } from 'lucid
 import { Article, outline } from './Article';
 import { BlogHeader, BlogFooter } from './BlogChrome';
 import { dateLabel } from './types';
+import { Blog8 } from '../ui/blog8';
+import { postPreview } from './post-preview';
 
 type PublishedPost = { slug: string; title: string; excerpt: string; tags: string; markdown: string; published_at: string; updated_at: string };
 type Options = { basePath: string; siteUrl?: string };
@@ -22,18 +24,25 @@ export function renderBlog(posts: PublishedPost[], post: PublishedPost | undefin
     <meta property="og:type" content={post ? 'article' : 'website'} /><meta property="og:title" content={title} /><meta property="og:description" content={description} />
     {canonical && <><link rel="canonical" href={canonical} /><meta property="og:url" content={canonical} /></>}
     <script dangerouslySetInnerHTML={{ __html: themeInit }} />
-    {['style.css', 'silk.css', 'navigation.css', 'site-chrome.css', 'typography.css', 'notebook.css', 'katex/katex.min.css'].map(file => <link key={file} rel="stylesheet" href={`${basePath}${file}`} />)}
+    {['style.css', 'silk.css', 'navigation.css', 'site-chrome.css', 'typography.css', 'notebook.css?v=blog8-1', 'katex/katex.min.css'].map(file => <link key={file} rel="stylesheet" href={`${basePath}${file}`} />)}
     <script src={`${basePath}blog-runtime.js`} defer /><script src={`${basePath}silk.js`} defer /><script src={`${basePath}navigation.js`} defer />
-  </head><body><div className="page page-notebook"><BlogHeader basePath={basePath} staticSite />
-    <main id="main" className="shell notebook-main"><div className="notebook-title"><div><span className="notebook-eyebrow">ARIQ’S NOTEBOOK</span><h1>{post ? 'Blog' : 'Blog.'}</h1>{!post && <p>{description}</p>}</div><a className="quiet-button" href={`${basePath}writeups.html`}><BookOpen size={15} />CTF Write Up <ArrowUpRight size={14} /></a></div>
+  </head><body><div className={`page page-notebook ${post ? '' : 'page-blog-index'}`}><BlogHeader basePath={basePath} staticSite />
+    <main id="main" className="shell notebook-main"><div className="notebook-title"><div><span className="notebook-eyebrow">ARIQ’S NOTEBOOK</span><h1>{post ? 'Blog' : 'Blog.'}</h1>{!post && <p>{description}</p>}</div>{post && <a className="quiet-button" href={`${basePath}writeups.html`}><BookOpen size={15} />CTF Write Up <ArrowUpRight size={14} /></a>}</div>
       {post ? <div className="reader-layout"><aside className="reader-navigation"><a className="quiet-button" href={`${basePath}blog/`}><ArrowLeft size={14} />All articles</a><span className="sidebar-label">ON THIS PAGE</span><nav aria-label="Article contents">{outline(post.markdown).map(item => <a key={item.id} href={`#${item.id}`} className={item.level === 3 ? 'heading-nested' : ''}>{item.title}</a>)}</nav></aside>
         <article className="blog-reading"><div className="article-metadata"><span>{dateLabel(post.published_at)}</span><span>{Math.max(1, Math.ceil(post.markdown.split(/\s+/).length / 220))} min read</span></div><h1>{post.title}</h1>{post.excerpt && <p className="article-lead">{post.excerpt}</p>}
           <div className="article-byline"><img src={`${basePath}assets/profile-avatar.jpg`} alt="" /><span>Ariq Ardian</span><div><a className="quiet-button" href="./content.md" download aria-label="Download article Markdown"><Download size={14} /></a><button className="quiet-button" data-copy-link aria-label="Copy article link"><Copy size={14} /></button></div></div>
           <Article markdown={post.markdown} /><p className="article-end">{post.tags.split(',').map(tag => tag.trim()).filter(Boolean).map(tag => <span key={tag}>{tag}</span>)}</p></article></div>
-        : <div className="library-layout"><aside className="library-sidebar"><span className="sidebar-label">LIBRARY</span><div className="library-reference"><a href={`${basePath}writeups.html`}>Competition writeups <ArrowUpRight size={13} /></a><a href="https://hackmd.io/@AriqArdian" target="_blank" rel="noopener noreferrer">HackMD notes <ArrowUpRight size={13} /></a></div></aside>
-          <section className="article-library" aria-label="Articles"><div className="library-heading"><h2>Published articles <span data-article-count>{posts.length}</span></h2><label className="article-search"><Search size={15} /><input type="search" aria-label="Search articles" placeholder="Search notes…" /></label></div>
-            <div className="article-list">{posts.map(item => <article key={item.slug} className="article-list-item" data-search={`${item.title} ${item.excerpt} ${item.tags}`.toLowerCase()}><div className="article-list-meta">{dateLabel(item.published_at)}</div><h3><a href={`${basePath}blog/${item.slug}/`}>{item.title}<ArrowUpRight size={18} /></a></h3>{item.excerpt && <p>{item.excerpt}</p>}<div className="article-list-bottom">{item.tags.split(',').map(tag => tag.trim()).filter(Boolean).join(' · ') || 'Notes'}</div></article>)}</div>
+        : <section className="article-library blog8-library" aria-label="Articles"><div className="library-heading"><h2>Published articles <span data-article-count aria-live="polite">{posts.length}</span></h2><label className="article-search"><Search size={15} /><input type="search" aria-label="Search articles" placeholder="Search notes…" /></label></div>
+            <Blog8 posts={posts.map(item => {
+              const preview = postPreview(item.markdown);
+              return { id: item.slug, title: item.title, summary: item.excerpt, author: 'Ariq Ardian',
+                published: dateLabel(item.published_at), date: item.published_at,
+                url: `${basePath}blog/${item.slug}/`,
+                image: preview.preview_image?.startsWith('./assets/') ? `${basePath}blog/${item.slug}/${preview.preview_image.slice(2)}` : preview.preview_image?.startsWith('/assets/') ? `${basePath}${preview.preview_image.slice(1)}` : preview.preview_image,
+                imageAlt: preview.preview_alt, tags: item.tags.split(',').map(tag => tag.trim()).filter(Boolean) };
+            })} />
             <div className="blog-empty" data-search-empty hidden={posts.length > 0}><h3>{posts.length ? 'No matching notes.' : 'The next idea starts here.'}</h3><p>{posts.length ? 'Try another title, keyword, or tag.' : 'New articles will appear here. In the meantime, explore my competition writeups.'}</p></div>
-          </section></div>}
+            <nav className="blog8-references" aria-label="More writing"><a href={`${basePath}writeups.html`}>Competition writeups <ArrowUpRight size={13} /></a><a href="https://hackmd.io/@AriqArdian" target="_blank" rel="noopener noreferrer">HackMD notes <ArrowUpRight size={13} /></a></nav>
+          </section>}
     </main><BlogFooter basePath={basePath} /><div className="blog-toast" role="status" hidden data-toast /></div></body></html>);
 }
