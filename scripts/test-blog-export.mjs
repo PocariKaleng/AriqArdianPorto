@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict';
 import { Buffer } from 'node:buffer';
 import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { publishedBundle, validateBundle, mapMarkdownUrls, checkPortableMarkdown, normalizeBase } from '../lib/blog-portable.mjs';
+
+const require = createRequire(import.meta.url);
+const mathRendererRequire = createRequire(require.resolve('rehype-katex'));
+assert.equal(require('katex').version, mathRendererRequire('katex').version,
+  'KaTeX styles and the Markdown renderer must use the same version for correct script and fraction sizing');
 
 const id = 'a1111111-1111-4111-8111-111111111111';
 const bytes = await readFile(new URL('../public/assets/explore/hackmd-profile.png', import.meta.url));
