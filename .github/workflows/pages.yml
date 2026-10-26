@@ -33,7 +33,7 @@ jobs:
         run: npm run build:static
         env:
           BLOG_BASE_PATH: ${{ steps.pages.outputs.base_path }}
-          BLOG_SITE_URL: ${{ steps.pages.outputs.base_url }}
+          BLOG_SITE_URL: https://${{ steps.pages.outputs.host }}${{ steps.pages.outputs.base_path }}
       - uses: actions/upload-pages-artifact@v4
         with:
           path: static-site
