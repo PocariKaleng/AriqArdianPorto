@@ -16,6 +16,7 @@ export function renderBlog(posts: PublishedPost[], post: PublishedPost | undefin
   const relativeUrl = post ? `blog/${post.slug}/` : 'blog/';
   const title = post ? `${post.title} · Ariq Ardian` : 'Blog · Ariq Ardian';
   const description = post?.excerpt || 'Notes on cryptography, blockchain, and the things I build.';
+  const articleTags = post?.tags.split(',').map(tag => tag.trim()).filter(Boolean) || [];
   const canonical = siteUrl ? `${siteUrl.replace(/\/$/, '')}/${relativeUrl}` : undefined;
   return '<!doctype html>\n' + renderToStaticMarkup(<html lang="en" data-theme="dark"><head>
     <meta charSet="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -25,14 +26,14 @@ export function renderBlog(posts: PublishedPost[], post: PublishedPost | undefin
     <meta property="og:type" content={post ? 'article' : 'website'} /><meta property="og:title" content={title} /><meta property="og:description" content={description} />
     {canonical && <><link rel="canonical" href={canonical} /><meta property="og:url" content={canonical} /></>}
     <script dangerouslySetInnerHTML={{ __html: themeInit }} />
-    {['style.css', 'silk.css', 'navigation.css', 'site-chrome.css', 'typography.css', 'notebook.css?v=blog-type-12', `katex/katex.min.css?v=${katex.version}`].map(file => <link key={file} rel="stylesheet" href={`${basePath}${file}`} />)}
+    {['style.css', 'silk.css', 'navigation.css', 'site-chrome.css', 'typography.css', 'notebook.css?v=blog-type-14', `katex/katex.min.css?v=${katex.version}`].map(file => <link key={file} rel="stylesheet" href={`${basePath}${file}`} />)}
     <script src={`${basePath}blog-runtime.js`} defer /><script src={`${basePath}silk.js`} defer /><script src={`${basePath}navigation.js`} defer />
   </head><body><div className={`page page-notebook ${post ? '' : 'page-blog-index'}`}><BlogHeader basePath={basePath} staticSite />
     <main id="main" className="shell notebook-main"><div className="notebook-title"><div><span className="notebook-eyebrow">ARIQ’S NOTEBOOK</span><h1>{post ? 'Blog' : 'Blog.'}</h1>{!post && <p>{description}</p>}</div>{post && <a className="quiet-button" href={`${basePath}writeups.html`}><BookOpen size={15} />CTF Write Up <ArrowUpRight size={14} /></a>}</div>
       {post ? <div className="reader-layout"><aside className="reader-navigation"><a className="quiet-button" href={`${basePath}blog/`}><ArrowLeft size={14} />All articles</a><span className="sidebar-label">ON THIS PAGE</span><nav aria-label="Article contents">{outline(post.markdown).map(item => <a key={item.id} href={`#${item.id}`} className={item.level === 3 ? 'heading-nested' : ''}>{item.title}</a>)}</nav></aside>
-        <article className="blog-reading"><div className="article-metadata"><span>{dateLabel(post.published_at)}</span><span>{Math.max(1, Math.ceil(post.markdown.split(/\s+/).length / 220))} min read</span></div><h1>{post.title}</h1>{post.excerpt && <p className="article-lead">{post.excerpt}</p>}
-          <div className="article-byline"><img src={`${basePath}assets/profile-avatar.jpg`} alt="" /><span>Ariq Ardian</span><div><a className="quiet-button" href="./content.md" download aria-label="Download article Markdown"><Download size={14} /></a><button className="quiet-button" data-copy-link aria-label="Copy article link"><Copy size={14} /></button></div></div>
-          <Article markdown={post.markdown} /><p className="article-end">{post.tags.split(',').map(tag => tag.trim()).filter(Boolean).map(tag => <span key={tag}>{tag}</span>)}</p></article></div>
+        <article className="blog-reading"><div className="article-metadata"><span>{dateLabel(post.published_at)}</span><span>{Math.max(1, Math.ceil(post.markdown.split(/\s+/).length / 220))} min read</span></div>{articleTags.length > 0 && <div className="article-tags" role="group" aria-label="Article tags">{articleTags.map(tag => <span key={tag}>{tag}</span>)}</div>}<h1>{post.title}</h1>{post.excerpt && <p className="article-lead">{post.excerpt}</p>}
+          <div className="article-byline"><img src={`${basePath}assets/blog-author-avatar.jpg`} alt="" /><span>Ariq Ardian</span><div><a className="quiet-button" href="./content.md" download aria-label="Download article Markdown"><Download size={14} /></a><button className="quiet-button" data-copy-link aria-label="Copy article link"><Copy size={14} /></button></div></div>
+          <Article markdown={post.markdown} /><p className="article-end">{articleTags.map(tag => <span key={tag}>{tag}</span>)}</p></article></div>
         : <section className="article-library blog8-library" aria-label="Articles"><div className="library-heading"><h2>Published articles <span data-article-count aria-live="polite">{posts.length}</span></h2><label className="article-search"><Search size={15} /><input type="search" aria-label="Search articles" placeholder="Search notes…" /></label></div>
             <Blog8 posts={posts.map(item => {
               const preview = postPreview(item.markdown);
