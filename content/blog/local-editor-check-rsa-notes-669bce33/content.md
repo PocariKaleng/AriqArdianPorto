@@ -1,6 +1,6 @@
 ## Challenge
 
-Hint : Expand (r+X)^5 in GF(mod)\[X\]/(X²-D), then replace X² with D. Focus on the X coefficient B. Treat r² as a new variable, solve the quadratic for it, recover r using a modular square root, then use q = coeffs·p + r to recover q.
+``Hint : Expand (r+X)^5 in GF(mod)[X]/(X²-D), then replace X² with D. Focus on the X coefficient B. Treat r² as a new variable, solve the quadratic for it, recover r using a modular square root, then use q = coeffs·p + r to recover q.``
 
 Jadi pada challenge ini diberikan file berikut : 
 

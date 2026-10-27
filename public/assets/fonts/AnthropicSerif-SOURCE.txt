@@ -1,0 +1,7 @@
+Anthropic Serif Roman
+Source: https://www.anthropic.com/_next/static/media/AnthropicSerif_Roman_Web-s.p.0twp0vwi-lncj.woff2
+Retrieved: 2026-10-27
+Used for blog page and article titles at the site owner's request.
+Also used for blog body and interface text at the owner's request.
+Italic source: https://www.anthropic.com/_next/static/media/AnthropicSerif_Italic_Web-s.p.1fjksu1uimpf3.woff2
+The typeface remains the property of its respective rights holders.
