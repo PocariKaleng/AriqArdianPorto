@@ -1,0 +1,9 @@
+{
+  "slug": "sui-blockchain-challenge-ctf",
+  "title": "Sui Blockchain Challenge CTF",
+  "excerpt": "A COMPFEST18 writeup on unbacked LP shares, reversed market identities, and a one-shot incentive claim in Sui Move. Follow the accounting, prove the exploit, and understand the fix.",
+  "tags": "Blockchain, Sui, Move, Smart Contract, CTF",
+  "status": "published",
+  "published_at": "2026-10-28T04:17:22.000Z",
+  "updated_at": "2026-10-28T04:17:22.000Z"
+}
