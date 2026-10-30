@@ -80,7 +80,7 @@
 @media(min-width:769px) { .reader-layout { padding-right:clamp(24px,4vw,80px); } }
 .blog-reading { min-width:0; }
 .reader-navigation { position:sticky; top:36px; align-self:start; font-size:12px; }
-.reader-navigation .sidebar-label { margin:32px 0 16px; }
+.reader-navigation .sidebar-label { margin:32px 0 16px; font:400 22px/1.2 var(--blog-title-font); letter-spacing:-.02em; color:var(--text); text-transform:none; }
 .reader-navigation nav { --toc-start:#c4a5ff; --toc-middle:#9fb9ff; --toc-end:#6bdde7; --toc-active:#b7baff; position:relative; display:grid; gap:12px; padding-left:14px; }
 :root[data-theme=light] .reader-navigation nav { --toc-start:#7437b5; --toc-middle:#335bcc; --toc-end:#006d87; --toc-active:#405ac2; }
 .reader-navigation nav::before { content:''; position:absolute; top:0; bottom:0; left:0; width:1px; background:var(--line); }
