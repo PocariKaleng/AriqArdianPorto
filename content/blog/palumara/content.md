@@ -633,10 +633,6 @@ Valid -> Flag
 The following is the v3 solver used for the local solve. Save it as `solve_vivi.py` to run the commands above.
 
 ```python filename="solve_vivi.py"
-#!/usr/bin/env python3
-# Run: sage solve_vivi.py LOCAL
-#      sage solve_vivi.py HOST PORT
-# Requires: sage, pwntools, ecdsa, pycryptodome
 
 import sys, hashlib
 from fractions import Fraction
@@ -654,7 +650,7 @@ p = int(curve.curve.p())
 TARGET = '浮気したらあかんで..., うちがそばにいるのに....!'.encode('utf-8')
 COUNT = 259
 SHIFT = 48
-ABOUND = 1 << (128 - SHIFT)  # int(sqrt(RFC6979-k)) / 2**SHIFT < 2**80
+ABOUND = 1 << (128 - SHIFT)
 D = pow(p, 3, n) * pow(2, SHIFT, n) % n
 ID = pow(D, -1, n)
 INV_P3 = pow(pow(p, 3, n), -1, n)
@@ -686,7 +682,6 @@ def collect(io):
 
 
 def relations(samples, keep):
-    # Constant nullspace dimension 8: reduce LLL cost in later stages.
     count = min(len(samples), 1 + (256 - keep) + 8)
     es = [e for e, _ in samples[:count]]
     A = matrix(ZZ, [[1] * count] + [
@@ -712,8 +707,6 @@ def projection(samples, lambdas, keep):
         S = es[:ll]
         z = sum(a*b for a, b in zip(lam, ts)) % n
         B = ABOUND * sum(abs(a) for a in lam)
-        # h(c) = sum_i lambda_i * ((e_i XOR c) & ((1<<keep)-1))
-        #      = base + sum_j coeff[j] * bit_j(c), using sum lambda_i = 0.
         base = sum(a * (e & mask) for a, e in zip(lam, S))
         coeff = [-2 * (1 << j) * sum(a * ((e >> j) & 1)
                 for a, e in zip(lam, S)) for j in range(keep)]
@@ -747,7 +740,6 @@ def initial(samples):
     r = len(proj)
     target = vector(ZZ, [int(rec[0])*scale for rec in proj] + [n // 2])
     print(f'[+] Initial CVP scale ~2^{scale.bit_length()}', flush=True)
-    # Avoid 64 expensive embedding reductions unless Babai fails for all guesses.
     for method in ('nearest_plane', 'embedding'):
         print(f'[+] Initial CVP method: {method}', flush=True)
         for guess in range(1 << keep):
@@ -784,7 +776,6 @@ def initial(samples):
 def next_bits(samples, w, uncertainty, mask, old_keep, keep):
     proj = projection(samples, relations(samples, keep), keep)
     bits = keep - old_keep
-    # Precompute h for every candidate mask extension.
     known = [low_h(rec, mask) for rec in proj]
     contrib = []
     for row in proj:
@@ -799,7 +790,6 @@ def next_bits(samples, w, uncertainty, mask, old_keep, keep):
     winners = []
     for guess in range(1 << bits):
         hs = [known[j] + contrib[j][guess] for j in range(len(proj))]
-        # Cheap rejection: the correct extension yields tiny centered residuals.
         if not all(abs(center(row[0] - w*hs[j])) <=
                    uncertainty*abs(hs[j]) + row[1]
                    for j, row in enumerate(proj)):
@@ -824,7 +814,6 @@ def check_key(w, mask, keep, samples):
     if c & ((1 << keep) - 1) != mask:
         return None
     for e, s in samples[:8]:
-        # From signature, nonce / (p**3) = int(float sqrt(...))
         k0 = (s - x * (e ^ c)) * INV_P3 % n
         if k0 >= (1 << 128) or k0 % (1 << SHIFT):
             return None
@@ -841,8 +830,6 @@ def recover(samples):
             print('[+] Checking exact keys in the remaining interval...', flush=True)
             for d in range(-uncertainty, uncertainty+1):
                 wd = (w+d) % n
-                # Integer-kernel projections cannot distinguish (w,c)
-                # from (-w, (~c) & ((1<<keep)-1)). Try both orientations.
                 for ww, cc in (
                     (wd, mask),
                     ((-wd) % n, mask ^ ((1 << keep) - 1)),
