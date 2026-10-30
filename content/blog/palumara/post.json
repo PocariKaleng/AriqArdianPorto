@@ -1,0 +1,9 @@
+{
+  "slug": "palumara",
+  "title": "Palumara",
+  "excerpt": "Breaking an ECC signature scheme with floating-point nonce leakage, integer kernels, and lattices.",
+  "tags": "Cryptography, ECDSA",
+  "status": "published",
+  "published_at": "2026-10-30T17:32:14.954Z",
+  "updated_at": "2026-10-30T17:35:46.076Z"
+}

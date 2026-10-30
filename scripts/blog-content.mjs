@@ -65,7 +65,11 @@ export async function loadContent() {
     validatePost(post);
     if (post.slug !== entry.name) throw new Error('Slug metadata berbeda dari nama folder.');
     const paths = new Set();
-    for (const asset of await readdir(path.join(folder, 'assets'), { withFileTypes: true })) {
+    const assets = await readdir(path.join(folder, 'assets'), { withFileTypes: true }).catch(error => {
+      if (error.code === 'ENOENT') return [];
+      throw error;
+    });
+    for (const asset of assets) {
       const assetPath = `assets/${asset.name}`;
       if (!asset.isFile() || !safeAsset(assetPath)) throw new Error(`File gambar tidak aman: ${assetPath}`);
       const mime = Object.entries(imageTypes).find(([, ext]) => assetPath.endsWith(`.${ext}`))?.[0];
@@ -80,7 +84,9 @@ export async function loadContent() {
 }
 
 export async function copyArticleAssets(post, destination) {
-  await cp(path.join(contentRoot, post.slug, 'assets'), path.join(destination, 'assets'), { recursive: true });
+  await cp(path.join(contentRoot, post.slug, 'assets'), path.join(destination, 'assets'), { recursive: true }).catch(error => {
+    if (error.code !== 'ENOENT') throw error;
+  });
 }
 
 export async function exportCommand(args) {
