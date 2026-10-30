@@ -880,6 +880,9 @@ def main():
 if __name__ == '__main__':
     main()
 ```
+
+![Solver output showing the recovered key and a valid signature.](./assets/95ab8ca0-23b2-4c64-8cc8-2e4a0a09de21.png)
+
 ---
 
 
