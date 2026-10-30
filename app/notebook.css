@@ -81,14 +81,19 @@
 .blog-reading { min-width:0; }
 .reader-navigation { position:sticky; top:36px; align-self:start; font-size:12px; }
 .reader-navigation .sidebar-label { margin:32px 0 16px; }
-.reader-navigation nav { display:grid; gap:12px; }
-.reader-navigation nav a { color:var(--muted); line-height:1.6; }
-.reader-navigation nav a:hover { color:var(--text); }
+.reader-navigation nav { position:relative; display:grid; gap:12px; padding-left:14px; }
+.reader-navigation nav::before { content:''; position:absolute; top:0; bottom:0; left:0; width:1px; background:var(--line); }
+.reader-navigation nav::after { content:''; position:absolute; top:0; left:-1px; width:3px; height:16px; border-radius:2px; background:var(--text); opacity:0; transform:translate3d(0,var(--toc-marker-y,0px),0); transition:transform 240ms cubic-bezier(.22,1,.36,1),opacity 180ms ease-out; pointer-events:none; }
+.reader-navigation nav[data-toc-ready]::after { opacity:1; }
+.reader-navigation nav a { display:block; color:var(--muted); line-height:1.6; transition:color 180ms ease-out,transform 180ms ease-out; }
+.reader-navigation nav a:hover,.reader-navigation nav a:focus-visible { color:var(--text); transform:translateX(3px); }
+.reader-navigation nav a[aria-current=location] { color:var(--text); transform:translateX(3px); }
 .reader-navigation nav .heading-nested { padding-left:12px; }
+@media(prefers-reduced-motion:reduce) { .reader-navigation nav::after,.reader-navigation nav a { transition:none; }.reader-navigation nav a:hover,.reader-navigation nav a:focus-visible,.reader-navigation nav a[aria-current=location] { transform:none; } }
 .article-metadata { display:flex; flex-wrap:wrap; gap:16px; color:var(--muted); font-size:11px; }
 .blog-reading > h1 { font:400 clamp(2.15rem,3.55vw,3.55rem)/.98 var(--blog-title-font); letter-spacing:-.03em; margin:20px 0; overflow-wrap:anywhere; }
 .article-lead { font-family:var(--blog-article-font); color:var(--muted); font-size:1.08rem; line-height:1.75; margin:0 0 24px; }
-.article-byline { display:flex; align-items:center; gap:10px; font-size:12px; margin:24px 0 48px; }
+.article-byline { display:flex; align-items:center; gap:10px; font-size:12px; margin:24px 0; padding-bottom:24px; border-bottom:1px solid var(--line); }
 .article-byline img { width:28px; height:28px; border-radius:50%; object-fit:cover; }
 .article-byline > div { display:flex; gap:16px; align-items:center; margin-left:auto; }
 .article-end { display:flex; flex-wrap:wrap; gap:8px; margin-top:48px; font-size:11px; color:var(--muted); }

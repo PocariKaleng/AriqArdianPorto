@@ -27,6 +27,7 @@ export async function buildStatic() {
   await cp(path.join(projectRoot, 'node_modules/katex/dist'), path.join(stage, 'katex'), { recursive: true });
   await cp(path.join(projectRoot, 'app/notebook.css'), path.join(stage, 'notebook.css'));
   await cp(path.join(projectRoot, 'scripts/blog-runtime.js'), path.join(stage, 'blog-runtime.js'));
+  await cp(path.join(projectRoot, 'lib/article-contents.mjs'), path.join(stage, 'article-contents.js'));
   await writeFile(path.join(stage, 'static-blog.css'), '[hidden]{display:none!important}\n');
   // Rewrite the existing portfolio's root URLs for GitHub project subpaths.
   for (const file of await readdir(stage)) {

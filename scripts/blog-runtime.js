@@ -1,4 +1,5 @@
 (() => {
+  import('./article-contents.js?v=1').then(({ mountArticleContents }) => mountArticleContents());
   let timer;
   function notify(text) {
     const toast = document.querySelector('[data-toast]');

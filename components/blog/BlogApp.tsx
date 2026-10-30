@@ -6,6 +6,7 @@ import { Blog8 } from '../ui/blog8';
 const PostEditor = lazy(() => import('./PostEditor').then(module => ({ default: module.PostEditor })));
 import { Article, outline } from './Article';
 import { api, dateLabel, downloadMarkdown, downloadWebsite, type BlogPost, type Summary } from './types';
+import { mountArticleContents } from '@/lib/article-contents.mjs';
 export function BlogApp({ initialSlug }: { initialSlug?: string }) {
   const [owner, setOwner] = useState(false), [ready, setReady] = useState(false), [posts, setPosts] = useState<Summary[]>([]);
   const [query, setQuery] = useState(''), [filter, setFilter] = useState('all'), [draft, setDraft] = useState<BlogPost | null>(null);
@@ -14,6 +15,10 @@ export function BlogApp({ initialSlug }: { initialSlug?: string }) {
   const [exporting, setExporting] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null), deleteDialog = useRef<HTMLDialogElement>(null);
   useEffect(() => { if (deletePost) deleteDialog.current?.showModal(); }, [deletePost]);
+  useEffect(() => {
+    if (!ready || !reading || draft || articleBusy) return;
+    return mountArticleContents();
+  }, [ready, reading, draft, articleBusy]);
   function notify(text: string) { setMessage(text); if (toastTimer.current) clearTimeout(toastTimer.current); toastTimer.current = setTimeout(() => setMessage(''), 6500); }
   async function refresh(canEdit: boolean) {
     const data = await api<{ posts: Summary[] }>(`/api/blog${canEdit ? '?drafts=1' : ''}`); setPosts(data.posts); setError('');
