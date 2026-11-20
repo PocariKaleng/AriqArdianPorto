@@ -92,6 +92,8 @@ Workflow tersedia di `.github/workflows/pages.yml`:
 
 Setelah menulis artikel berikutnya: **Publish/Update article → `npm run blog:prepare` → commit perubahan `content/blog/` → push**. GitHub membangun ulang dari snapshot tersebut; tidak menghubungi editor atau komputer lokal. Workflow menyesuaikan URL aset dengan subfolder repository dan membuat canonical/metadata sharing serta sitemap.
 
+Halaman Blog (`/blog/`) dan setiap artikel (`/blog/<slug>/`) dibuat saat build dengan template di `scripts/redesign/`. Build juga mengisi post terbaru ke beranda: status log menampilkan satu post terbaru, dan bagian Notes menampilkan tiga. Artikel baru otomatis memakai desain ini. Untuk mengatur tampilannya (judul pendek, sampul, ikon, ringkasan), tambahkan entri dengan slug artikel di `scripts/redesign/posts.json`; semua kolomnya opsional.
+
 Folder `static-site/` adalah hasil build dan diabaikan Git. Workflow mengunggah folder itu sebagai artifact Pages. Tidak ada token, database cloud, R2, atau login online yang perlu disiapkan untuk alur statis ini.
 
 Panduan resmi: [custom workflow GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
@@ -110,8 +112,9 @@ Pemeriksaan 4 Oktober 2026 setelah patch: `npm audit --omit=dev` melaporkan 0 ad
 | --- | --- |
 | `content/blog/` | Snapshot artikel Published, Markdown, dan gambar |
 | `components/blog/`, `app/`, `lib/` | Editor lokal, renderer artikel, dan API lokal |
-| `public/` | Halaman portfolio, aset, widget, dan PDF Write Up |
+| `public/` | Halaman portfolio (desain pixel: `index.html`, `about.html`, `writeups.html`, `work/`, `css/`, `js/`, `img/`), aset, dan PDF Write Up |
 | `scripts/` | Ekspor, validasi, build statis, dan preview |
+| `scripts/redesign/` | Template halaman Blog dan artikel desain pixel, beserta `posts.json` |
 | `.github/workflows/` | Build dan deployment GitHub Pages |
 
 Editor memakai React/Vinext, TipTap, dan CodeMirror. Renderer artikel memakai React Markdown dan KaTeX; artifact publik berupa HTML, CSS, dan JavaScript. Font blog dan gambar unggahan disertakan dalam artifact. Halaman portfolio juga memakai Google Fonts; sampul musik mengambil gambar dari CDN Spotify. Tautan sosial, demo proyek, dan embed pihak ketiga memerlukan internet dan layanan asalnya.

@@ -1,0 +1,24 @@
+{
+  "_about": "Optional display details per article slug for the blog index, the home page notes and the status log. Every field is optional; an article that is not listed here gets defaults from its post.json (title, excerpt, tags) and its first image.",
+  "palumara": {
+    "cover": "img/blog/palumara.jpg",
+    "icon": "key",
+    "peekLabel": "palumara",
+    "statusTail": "breaking an ECC signature scheme"
+  },
+  "sui-blockchain-challenge-ctf": {
+    "excerpt": "A COMPFEST18 writeup on unbacked LP shares, reversed market identities, and a one-shot incentive claim in Sui Move.",
+    "cover": "img/blog/sui.jpg",
+    "icon": "block",
+    "peekLabel": "sui move",
+    "noteChips": ["Blockchain", "Sui Move"]
+  },
+  "local-editor-check-rsa-notes-669bce33": {
+    "title": "HOLOGY9 Final Unsolved: Acheron",
+    "excerpt": "RSA with a strange quotient. The challenge takes a little longer to generate its numbers.",
+    "cover": "img/blog/acheron.jpg",
+    "icon": "key",
+    "peekLabel": "acheron",
+    "lang": "id"
+  }
+}

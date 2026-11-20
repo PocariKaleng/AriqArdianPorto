@@ -5,6 +5,7 @@ import { build } from 'vite';
 import { projectRoot, loadContent, copyArticleAssets } from './blog-content.mjs';
 import { mapMarkdownUrls, normalizeBase } from '../lib/blog-portable.mjs';
 import { buildHighlights } from './build-highlights.mjs';
+import { writePixelBlog } from './redesign/render.mjs';
 
 export async function buildStatic() {
   const basePath = normalizeBase(process.env.BLOG_BASE_PATH);
@@ -28,7 +29,6 @@ export async function buildStatic() {
   await cp(path.join(projectRoot, 'app/notebook.css'), path.join(stage, 'notebook.css'));
   await cp(path.join(projectRoot, 'scripts/blog-runtime.js'), path.join(stage, 'blog-runtime.js'));
   await cp(path.join(projectRoot, 'lib/article-contents.mjs'), path.join(stage, 'article-contents.js'));
-  await writeFile(path.join(stage, 'static-blog.css'), '[hidden]{display:none!important}\n');
   // Rewrite the existing portfolio's root URLs for GitHub project subpaths.
   for (const file of await readdir(stage)) {
     if (!/\.(html|css|js)$/.test(file)) continue;
@@ -42,20 +42,22 @@ export async function buildStatic() {
   }
   await mkdir(path.join(stage, 'blog'), { recursive: true });
   const options = { basePath, siteUrl };
-  function withHiddenStyle(html) { return html.replace('</head>', `<link rel="stylesheet" href="${basePath}static-blog.css"></head>`); }
-  await writeFile(path.join(stage, 'blog/index.html'), withHiddenStyle(renderBlog(posts, undefined, options)));
+  // The renderer turns each article's Markdown into HTML; the pages around it are the pixel design's
+  // (scripts/redesign), which also lists the latest posts on the home page.
+  const renderedPages = new Map();
   for (const post of posts) {
     const folder = path.join(stage, 'blog', post.slug);
     await mkdir(folder, { recursive: true });
     await copyArticleAssets(post, folder);
     const rendered = { ...post, markdown: await mapMarkdownUrls(post.markdown, async url => url.startsWith('/assets/') || url.startsWith('/blog/') ? `${basePath}${url.slice(1)}` : url) };
-    await writeFile(path.join(folder, 'index.html'), withHiddenStyle(renderBlog(posts, rendered, options)));
+    renderedPages.set(post.slug, renderBlog(posts, rendered, options));
     await writeFile(path.join(folder, 'content.md'), `# ${post.title}\n\n${post.markdown}`);
   }
+  await writePixelBlog({ stage, posts, renderArticle: post => renderedPages.get(post.slug), siteUrl });
   await writeFile(path.join(stage, '.nojekyll'), '');
   if (siteUrl) {
     const escapeXml = value => value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[char]);
-    const urls = ['index.html', 'work.html', 'writeups.html', 'about.html', 'contact.html', 'blog/', ...posts.map(post => `blog/${post.slug}/`)];
+    const urls = ['', 'about.html', 'writeups.html', 'work/securevault.html', 'blog/', ...posts.map(post => `blog/${post.slug}/`)];
     await writeFile(path.join(stage, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(url => `<url><loc>${escapeXml(`${siteUrl.replace(/\/$/, '')}/${url}`)}</loc></url>`).join('')}</urlset>`);
   }
   const { rename, lstat, rm, realpath } = await import('node:fs/promises');

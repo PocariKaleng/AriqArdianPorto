@@ -46,6 +46,9 @@
 .post__cover.is-pixel img { visibility: hidden; }
 .post__cover.is-pixel.is-sharp img { visibility: visible; }
 .post__cover.is-sharp canvas { visibility: hidden; }
+/* a post with no picture: a pixel note on the dark plate instead */
+.post__cover--empty { display: grid; place-items: center; }
+.post__cover--empty .px-icon { width: calc(var(--px) * 16); height: calc(var(--px) * 16); color: var(--accent-inv); }
 .post__link:hover .post__cover {
   transform: translate(calc(var(--px-b) * -1), calc(var(--px-b) * -1));
   box-shadow:
