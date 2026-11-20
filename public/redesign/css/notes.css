@@ -1,0 +1,178 @@
+/* ---------- notes: the latest posts (home) and the other places with notes (writeups) ----------
+   Each note is a pixel-framed strip, not a ruled line: an index, a category icon, the title with its date,
+   reading time and summary, and its tags.
+
+   Entrance, once, when the list scrolls in (a personal site's first-visit moment, so it may take room):
+     note 1  120ms  print left to right, 7 steps over 420ms, a dither band riding the print edge
+     note 2  210ms  same                                          (overlaps note 1, 90ms behind)
+     note 3  270ms  same                                          (60ms behind: the gaps shrink, it reads as a wave)
+     the title keeps its own word rise; the frame, icon and tags arrive with their strip, never on their own.
+   Hover (fine pointer only), all on the same frame:
+     lead        the strip lifts onto its green shadow and inverts (160ms, 2 steps; a transition, so leaving retargets)
+     support     a dither scan sweeps it once; the title decrypts (pixel.js)
+     decoration  the icon flips frames, the arrow steps forward
+     plus a preview of the post that follows the cursor and resolves from pixels (notes.js).
+   Keyboard focus gets the lift and the inversion only: a focused link's name never scrambles. */
+.notes { display: grid; gap: var(--s-4); }
+/* every colour a strip uses is a variable, so the inverted state is one block for hover and one for focus */
+.note {
+  --pxc: var(--line-strong);
+  --lift: 0px; --shade: 0px; --go: 0px;
+  --n-bg: var(--paper-3); --n-title: var(--ink); --n-desc: var(--ink-2); --n-meta: var(--muted);
+  --n-hi: var(--accent); --n-num: var(--muted);
+  --n-icon-bg: var(--paper); --n-icon-fg: var(--ink); --n-icon-line: var(--line-strong);
+  --n-chip: var(--ink); --n-chip-bg: var(--paper-2); --n-chip-line: var(--line); --n-cat: var(--accent);
+  position: relative; overflow: hidden; isolation: isolate;
+  display: grid;
+  grid-template-columns: 2.6ch calc(var(--s-7) - var(--s-1)) minmax(0, 1fr) auto auto;
+  gap: var(--s-5); align-items: center;
+  padding: var(--s-4) var(--s-5);
+  background: var(--n-bg); color: var(--n-title); text-decoration: none;
+  transform: translate(var(--lift), var(--lift));
+  box-shadow:
+    0 calc(var(--px-b) * -1) 0 0 var(--pxc), 0 var(--px-b) 0 0 var(--pxc),
+    calc(var(--px-b) * -1) 0 0 0 var(--pxc), var(--px-b) 0 0 0 var(--pxc),
+    var(--shade) var(--shade) 0 0 var(--accent);
+  transition: transform var(--dur-1) steps(2), box-shadow var(--dur-1) steps(2), background-color var(--dur-1) steps(2);
+}
+.note > * { position: relative; z-index: 1; }
+
+.note__no {
+  font-family: var(--font-display); font-weight: var(--display-weight);
+  font-size: var(--fs-small); color: var(--n-num); font-variant-numeric: tabular-nums;
+}
+.note__icon {
+  display: grid; place-items: center;
+  width: calc(var(--s-7) - var(--s-1)); height: calc(var(--s-7) - var(--s-1));
+  background: var(--n-icon-bg); color: var(--n-icon-fg);
+  box-shadow:
+    0 calc(var(--px-b) * -1) 0 0 var(--n-icon-line), 0 var(--px-b) 0 0 var(--n-icon-line),
+    calc(var(--px-b) * -1) 0 0 0 var(--n-icon-line), var(--px-b) 0 0 0 var(--n-icon-line);
+}
+.note__icon .px-icon { color: inherit; }   /* the icon follows the strip's state; its size stays the token's 10 sprite px */
+.note__body { display: grid; gap: 2px; min-width: 0; }
+.note__meta { color: var(--n-meta); }
+.note__meta b { color: var(--n-hi); font-weight: 600; }
+.note__title { color: var(--n-title); font-weight: 700; font-size: var(--fs-h3); line-height: 1.3; }
+.note__desc { max-width: 62ch; color: var(--n-desc); font-size: var(--fs-small); line-height: 1.5; }
+.note__tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--s-2); max-width: 18rem; }
+.note__chip {
+  padding: 2px var(--s-2);
+  font-size: var(--fs-micro); font-weight: 600; letter-spacing: var(--track-micro); text-transform: uppercase;
+  color: var(--n-chip); background: var(--n-chip-bg);
+  box-shadow: 0 0 0 1px var(--n-chip-line);
+}
+.note__chip--cat { color: var(--n-cat); background: transparent; box-shadow: 0 0 0 1px var(--n-cat); }
+.note__go {
+  font-family: var(--font-display); color: var(--n-num);
+  transform: translateX(var(--go));
+  transition: transform var(--dur-1) steps(2);
+}
+
+/* the dither scan (hover) and the print band (entrance): two layers, so leaving a hover never replays the print */
+.note::before, .note::after {
+  content: ""; position: absolute; z-index: 0; top: 0; bottom: 0; left: 0; width: 34%;
+  background-size: var(--dither) var(--dither);
+  opacity: 0; transform: translateX(-110%); pointer-events: none;
+}
+.note::before { background-image: repeating-conic-gradient(var(--accent-inv) 0 25%, transparent 0 50%); }
+.note::after { background-image: repeating-conic-gradient(var(--accent) 0 25%, transparent 0 50%); }
+
+/* the inverted state: the strip lifts onto its green shadow and turns to ink */
+.note:focus-visible {
+  outline-offset: 6px;
+  --lift: calc(var(--px-b) * -1); --shade: calc(var(--px-b) * 3); --go: var(--s-1);
+  --n-bg: var(--ink); --n-title: var(--paper);
+  --n-desc: color-mix(in srgb, var(--paper) 78%, var(--ink)); --n-meta: color-mix(in srgb, var(--paper) 66%, var(--ink));
+  --n-hi: var(--accent-inv); --n-num: var(--accent-inv);
+  --n-icon-bg: var(--accent-inv); --n-icon-fg: var(--ink); --n-icon-line: var(--accent-inv);
+  --n-chip: var(--paper); --n-chip-bg: transparent; --n-chip-line: color-mix(in srgb, var(--paper) 40%, var(--ink)); --n-cat: var(--accent-inv);
+}
+/* touch screens fire a sticky :hover on tap, so the hover look only exists for a fine pointer */
+@media (hover: hover) and (pointer: fine) {
+  .note:hover {
+    --lift: calc(var(--px-b) * -1); --shade: calc(var(--px-b) * 3); --go: var(--s-1);
+    --n-bg: var(--ink); --n-title: var(--paper);
+    --n-desc: color-mix(in srgb, var(--paper) 78%, var(--ink)); --n-meta: color-mix(in srgb, var(--paper) 66%, var(--ink));
+    --n-hi: var(--accent-inv); --n-num: var(--accent-inv);
+    --n-icon-bg: var(--accent-inv); --n-icon-fg: var(--ink); --n-icon-line: var(--accent-inv);
+    --n-chip: var(--paper); --n-chip-bg: transparent; --n-chip-line: color-mix(in srgb, var(--paper) 40%, var(--ink)); --n-cat: var(--accent-inv);
+  }
+  .note:hover::before { animation: px-scan var(--dur-scan) steps(9, end) 1; }
+  .note:hover .px-icon .f1 { animation: px-f1 .4s steps(1) infinite; }
+  .note:hover .px-icon .f2 { animation: px-f2 .4s steps(1) infinite; }
+}
+/* press: the strip lands back on the paper */
+.note:active { --lift: 0px; --shade: 0px; }
+
+/* the print entrance; backwards fill, so no clip is left behind to cut the lift shadow */
+@keyframes note-print {
+  from { clip-path: inset(-8px 100% -8px -8px); }
+  to { clip-path: inset(-8px -8px -8px -8px); }
+}
+/* the band's right edge sits on the print edge: left = p*100% - 34%, so translateX runs -100% to 194% */
+@keyframes note-band {
+  0% { opacity: .6; transform: translateX(-100%); }
+  88% { opacity: .6; transform: translateX(194%); }
+  100% { opacity: 0; transform: translateX(194%); }
+}
+.notes li:nth-child(1) .note { --d: 120ms; }
+.notes li:nth-child(2) .note { --d: 210ms; }
+.notes li:nth-child(3) .note { --d: 270ms; }
+.notes li:nth-child(n + 4) .note { --d: 310ms; }
+.js .notes[data-unlock]:not(.is-in) .note { opacity: 0; }
+.js .notes[data-unlock].is-in .note { animation: note-print 420ms steps(7, end) backwards; animation-delay: var(--d); }
+.js .notes[data-unlock].is-in .note::after { animation: note-band 420ms steps(7, end) backwards; animation-delay: var(--d); }
+
+/* ---------- the peek: a small window with the post's picture that follows the cursor ---------- */
+.note-peek {
+  position: fixed; z-index: 45; left: 0; top: 0;
+  width: 300px; pointer-events: none;
+  transform: translate3d(-9999px, -9999px, 0);
+}
+.note-peek__win {
+  --pxc: var(--line-strong);
+  background: var(--paper-3);
+  box-shadow:
+    0 calc(var(--px-b) * -1) 0 0 var(--pxc), 0 var(--px-b) 0 0 var(--pxc),
+    calc(var(--px-b) * -1) 0 0 0 var(--pxc), var(--px-b) 0 0 0 var(--pxc),
+    calc(var(--px-b) * 3) calc(var(--px-b) * 3) 0 0 var(--accent);
+  opacity: 0; transform: scale(.94); transform-origin: var(--origin, 0% 100%);
+  transition: opacity var(--dur-1) steps(3), transform var(--dur-1) steps(3);
+}
+.note-peek.is-on .note-peek__win { opacity: 1; transform: none; }
+.note-peek__bar {
+  display: flex; justify-content: space-between; align-items: center; gap: var(--s-2);
+  padding: var(--s-1) var(--s-3); background: var(--ink); color: var(--paper);
+}
+.note-peek__cap { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.note-peek__dot { flex: none; width: var(--s-2); height: var(--s-2); background: var(--accent-inv); }
+.note-peek.is-on .note-peek__dot { animation: sel-blink 1s steps(1) infinite; }   /* parked off screen it holds still */
+.note-peek__img { position: relative; aspect-ratio: 2.34; overflow: hidden; background: var(--ink); }
+.note-peek__img img, .note-peek__img canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: top center; display: block; image-rendering: pixelated;
+}
+.note-peek__img canvas { visibility: hidden; }
+.note-peek__img.is-resolving canvas { visibility: visible; }
+.note-peek__img.is-resolving img { visibility: hidden; }
+
+/* ---------- smaller screens: tags move under the summary, the index steps aside on phones ---------- */
+@media (max-width: 1099px) {
+  .note { grid-template-columns: 2.6ch calc(var(--s-7) - var(--s-1)) minmax(0, 1fr) auto; row-gap: var(--s-3); }
+  .note__tags { grid-column: 3; grid-row: 2; justify-content: flex-start; max-width: none; }
+  .note__go { grid-column: 4; grid-row: 1; }
+}
+@media (max-width: 599px) {
+  .note { grid-template-columns: calc(var(--s-7) - var(--s-1)) minmax(0, 1fr) auto; gap: var(--s-3) var(--s-4); padding: var(--s-4); align-items: start; }
+  .note__no { display: none; }
+  .note__tags { grid-column: 2 / -1; }
+  .note__go { grid-column: 3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .notes .note { opacity: 1 !important; animation: none !important; clip-path: none !important; }
+  .note::before, .note::after, .note .px-icon .f1, .note .px-icon .f2, .note-peek__dot { animation: none !important; }
+  .note:hover, .note:focus-visible { --lift: 0px; --go: 0px; }   /* keep the inversion, drop the movement */
+  .note-peek__win { transform: none; }
+}

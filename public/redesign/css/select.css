@@ -1,0 +1,204 @@
+/* Selected work as a project-select screen: a menu with a blinking pixel cursor on the left,
+   the chosen project's screen on the right. The screen resolves from pixels when the choice changes. */
+.select {
+  --pxc: var(--line-strong);
+  background: var(--paper-3);
+  box-shadow:
+    0 calc(var(--px-b) * -1) 0 0 var(--pxc), 0 var(--px-b) 0 0 var(--pxc),
+    calc(var(--px-b) * -1) 0 0 0 var(--pxc), var(--px-b) 0 0 0 var(--pxc);
+}
+.select__bar {
+  display: flex; align-items: center; gap: var(--s-5);
+  padding: var(--s-3) var(--s-5);
+  background: var(--ink); color: var(--paper);
+}
+.select__bar h2 { color: var(--paper); }
+.select__bar .meta { color: color-mix(in srgb, var(--paper) 65%, var(--ink)); }
+.select__hint { margin-left: auto; }
+
+.select__body { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--s-7); padding: var(--s-6) var(--s-5) var(--s-6) var(--s-4); align-items: start; }
+
+/* the menu */
+.select__list { display: grid; gap: var(--s-2); }
+.sel {
+  position: relative;
+  display: grid; grid-template-columns: var(--s-4) var(--s-6) minmax(0, 1fr); align-items: center; gap: var(--s-1) var(--s-3);
+  min-height: var(--tap);
+  padding: var(--s-4) var(--s-4) var(--s-4) var(--s-3);
+  color: var(--ink); text-decoration: none;
+  transition: background-color var(--dur-1) steps(2), color var(--dur-1) steps(2);
+}
+.sel__cursor { width: calc(var(--px) * 5); height: calc(var(--px) * 7); color: var(--accent); visibility: hidden; }
+.sel__no { font-family: var(--font-display); font-weight: var(--display-weight); font-size: var(--fs-small); color: var(--muted); }
+.sel__name {
+  font-family: var(--font-display); font-weight: var(--display-weight); font-stretch: var(--display-stretch);
+  font-size: var(--fs-h3); line-height: 1.15; letter-spacing: var(--track-display); text-transform: var(--display-transform);
+}
+.sel__kind { grid-column: 3; color: var(--muted); }
+.sel__cursor, .sel__no { grid-row: 1 / span 2; }
+.sel__more { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } /* read by screen readers on wide screens */
+.sel__thumb { display: none; }
+
+.sel.is-current { background: var(--ink); color: var(--paper); }
+.sel.is-current .sel__no, .sel.is-current .sel__kind { color: color-mix(in srgb, var(--paper) 70%, var(--ink)); }
+.sel.is-current .sel__cursor { visibility: visible; color: var(--accent-inv); animation: sel-blink 1s steps(1) infinite; }
+@keyframes sel-blink { 0%, 59% { opacity: 1; } 60%, 100% { opacity: 0; } }
+.sel:focus-visible { outline-offset: var(--s-1); }
+
+/* the screen */
+.select__screen { display: grid; gap: var(--s-4); }
+.screen {
+  --pxc: var(--ink);
+  position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: var(--ink);
+  box-shadow:
+    0 calc(var(--px-b) * -1) 0 0 var(--pxc), 0 var(--px-b) 0 0 var(--pxc),
+    calc(var(--px-b) * -1) 0 0 0 var(--pxc), var(--px-b) 0 0 0 var(--pxc),
+    calc(var(--px-b) * 3) calc(var(--px-b) * 3) 0 0 var(--accent);
+}
+.screen img, .screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; image-rendering: pixelated; }
+.screen.is-resolving img { visibility: hidden; }
+.screen canvas { visibility: hidden; }
+.screen.is-resolving canvas { visibility: visible; }
+.screen__cap { display: grid; gap: var(--s-3); }
+.screen__desc { color: var(--ink-2); max-width: 52ch; }
+.screen__foot { display: flex; justify-content: space-between; gap: var(--s-4); align-items: baseline; flex-wrap: wrap; }
+.screen__cta { font-weight: 600; color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sel.is-current .sel__cursor { animation: none; }
+}
+
+/* tablet and phone: the menu becomes cards, each carrying its own screen */
+@media (max-width: 899px) {
+  .select__body { grid-template-columns: minmax(0, 1fr); padding: var(--s-4); }
+  .select__screen, .select__hint { display: none; }
+  .sel { grid-template-columns: var(--s-6) minmax(0, 1fr); padding: var(--s-4); }
+  .sel__kind { grid-column: 2; }
+  .sel__no { grid-row: 1 / span 2; }
+  .sel__cursor { display: none; }
+  .sel__more { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; grid-column: 1 / -1; display: grid; gap: var(--s-2); margin-top: var(--s-3); }
+  .sel__thumb { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top center; }
+  .sel__desc { color: inherit; opacity: .85; }
+  .sel__tags { color: inherit; opacity: .7; }
+  .sel.is-current { background: transparent; color: var(--ink); }
+  .sel.is-current .sel__no, .sel.is-current .sel__kind { color: var(--muted); }
+  .select__list { gap: var(--s-5); }
+}
+
+
+/* ---------- motion ----------
+   Entrance (once, when the frame scrolls in): the screen powers on (a bright line opens to the full picture),
+   the menu rows pop in a short wave with shrinking gaps, then the first picture resolves from pixels.
+   Hover on a row: a dither scan sweeps it once and its name decrypts (pointer only; keyboard focus never
+   scrambles a link's name). */
+.sel { overflow: hidden; isolation: isolate; }
+.sel > * { position: relative; z-index: 1; }
+.sel::before {
+  content: ""; position: absolute; z-index: 0; top: 0; bottom: 0; left: 0; width: 34%;
+  background-image: repeating-conic-gradient(var(--scan, var(--accent)) 0 25%, transparent 0 50%);
+  background-size: var(--dither) var(--dither);
+  opacity: 0; transform: translateX(-110%); pointer-events: none;
+}
+.sel.is-current { --scan: var(--accent-inv); }
+.sel:hover::before { animation: px-scan var(--dur-scan) steps(9, end) 1; }
+@keyframes scr-boot {
+  0% { clip-path: inset(50% 0 50% 0); filter: brightness(3); }
+  35% { clip-path: inset(49% 0 49% 0); filter: brightness(3); }
+  100% { clip-path: inset(0 0 0 0); filter: none; }
+}
+.js .select:not(.is-on) .sel, .js .select:not(.is-on) .screen, .js .select:not(.is-on) .screen__cap { opacity: 0; }
+.js .select.is-on .screen { animation: scr-boot 420ms steps(6, end) backwards; }   /* backwards: no clip left behind to cut the frame */
+.js .select.is-on .screen__cap { animation: px-pop 320ms steps(4, end) 380ms backwards; }
+.js .select.is-on .sel { animation: px-pop 320ms steps(4, end) backwards; }
+.js .select.is-on li:nth-child(2) .sel { animation-delay: 70ms; }
+.js .select.is-on li:nth-child(3) .sel { animation-delay: 120ms; }
+.js .select.is-on li:nth-child(4) .sel { animation-delay: 150ms; }
+.js .select.is-on .sel:hover { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .js .select .sel, .js .select .screen, .js .select .screen__cap { opacity: 1 !important; animation: none !important; }
+  .sel:hover::before { animation: none; }
+}
+
+
+/* ---------- home: status.log, a small terminal window of what is happening lately ----------
+   Entrance: each line types in (a stepped clip, so its bold and underline survive), one after another;
+   the meta line arrives as its line finishes; a block cursor blinks after "ready".
+   Hover: the row inverts, a dither scan sweeps it, the icon flips frames and the arrow steps forward. */
+.status {
+  --pxc: var(--line-strong);
+  grid-column: 7 / span 4; align-self: start;
+  background: var(--paper-3);
+  box-shadow:
+    0 calc(var(--px-b) * -1) 0 0 var(--pxc), 0 var(--px-b) 0 0 var(--pxc),
+    calc(var(--px-b) * -1) 0 0 0 var(--pxc), var(--px-b) 0 0 0 var(--pxc),
+    calc(var(--px-b) * 3) calc(var(--px-b) * 3) 0 0 var(--accent);
+}
+.status__bar { display: flex; justify-content: space-between; align-items: center; gap: var(--s-3); padding: var(--s-2) var(--s-4); background: var(--ink); color: var(--paper); }
+.status__bar h2 { color: var(--paper); letter-spacing: var(--track-micro); }
+.status__count { color: color-mix(in srgb, var(--paper) 65%, var(--ink)); }
+.status__list { display: grid; padding: var(--s-2); gap: var(--s-1); }
+.status__item {
+  position: relative; overflow: hidden; isolation: isolate;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--s-4); align-items: center;
+  padding: var(--s-3);
+  color: var(--ink); text-decoration: none;
+  transition: background-color var(--dur-1) steps(2), color var(--dur-1) steps(2);
+}
+.status__item > * { position: relative; z-index: 1; }
+.status__item::before {
+  content: ""; position: absolute; z-index: 0; top: 0; bottom: 0; left: 0; width: 34%;
+  background-image: repeating-conic-gradient(var(--accent-inv) 0 25%, transparent 0 50%);
+  background-size: var(--dither) var(--dither);
+  opacity: 0; transform: translateX(-110%); pointer-events: none;
+}
+.status__icon {
+  --pxc: var(--line-strong);
+  display: grid; place-items: center; width: calc(var(--s-7) - var(--s-1)); height: calc(var(--s-7) - var(--s-1));
+  background: var(--paper);
+  box-shadow:
+    0 calc(var(--px-b) * -1) 0 0 var(--pxc), 0 var(--px-b) 0 0 var(--pxc),
+    calc(var(--px-b) * -1) 0 0 0 var(--pxc), var(--px-b) 0 0 0 var(--pxc);
+}
+.status__item--win .status__icon { --pxc: var(--accent); background: var(--accent); }
+.status__item--win .status__icon .px-icon { color: var(--accent-ink); }
+.status__body { display: grid; gap: 2px; min-width: 0; }
+.status__label { color: var(--accent); }
+.status__text { display: block; font-size: var(--fs-body); line-height: 1.4; color: var(--ink); }
+.status__text u { text-underline-offset: .18em; }
+.status__meta { font-size: var(--fs-small); color: var(--muted); }
+.status__go { font-family: var(--font-display); color: var(--muted); transition: transform var(--dur-1) steps(2), color var(--dur-1) steps(2); }
+.status__prompt { display: flex; align-items: center; gap: var(--s-2); padding: var(--s-2) var(--s-4) var(--s-3); color: var(--muted); border-top: 1px dashed var(--line); }
+.status__caret { color: var(--accent); }
+.status__cursor { display: inline-block; width: var(--s-2); height: var(--s-3); background: var(--accent); animation: sel-blink 1s steps(1) infinite; }
+
+.status__item:hover, .status__item:focus-visible { background: var(--ink); color: var(--paper); }
+.status__item:hover .status__text, .status__item:focus-visible .status__text { color: var(--paper); }
+.status__item:hover .status__meta, .status__item:focus-visible .status__meta { color: color-mix(in srgb, var(--paper) 70%, var(--ink)); }
+.status__item:hover .status__label, .status__item:focus-visible .status__label { color: var(--accent-inv); }
+.status__item:hover .status__go, .status__item:focus-visible .status__go { transform: translateX(var(--s-1)); color: var(--accent-inv); }
+.status__item:hover::before { animation: px-scan var(--dur-scan) steps(9, end) 1; }
+.status__item:hover .px-icon .f1 { animation: px-f1 .4s steps(1) infinite; }
+.status__item:hover .px-icon .f2 { animation: px-f2 .4s steps(1) infinite; }
+
+/* the typing entrance */
+@keyframes status-type { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.status__type { display: inline; }
+.js .status[data-unlock]:not(.is-in) .status__type,
+.js .status[data-unlock]:not(.is-in) .status__meta,
+.js .status[data-unlock]:not(.is-in) .status__icon,
+.js .status[data-unlock]:not(.is-in) .status__prompt { opacity: 0; }
+.js .status[data-unlock].is-in .status__icon { animation: px-pop 280ms steps(3, end) backwards; animation-delay: calc(var(--n) * 520ms); }
+.js .status[data-unlock].is-in .status__text { animation: status-type 480ms steps(var(--steps, 24), end) backwards; animation-delay: calc(var(--n) * 520ms + 120ms); }
+.js .status[data-unlock].is-in .status__meta { animation: px-pop 240ms steps(3, end) backwards; animation-delay: calc(var(--n) * 520ms + 560ms); }
+.js .status[data-unlock].is-in .status__prompt { animation: px-pop 240ms steps(3, end) backwards; animation-delay: 1.7s; }
+.status__item { --steps: 24; }
+
+@media (prefers-reduced-motion: reduce) {
+  .js .status .status__type, .js .status .status__meta, .js .status .status__icon, .js .status .status__prompt, .js .status .status__text { opacity: 1 !important; animation: none !important; clip-path: none !important; }
+  .status__cursor { animation: none; }
+  .status__item:hover::before, .status__item:hover .px-icon .f1, .status__item:hover .px-icon .f2 { animation: none; }
+}
+@media (max-width: 899px) { .status { grid-column: 1; } }
+
+.hero__intro { align-content: start; }
+.status__text b, .status__text u { color: inherit; }

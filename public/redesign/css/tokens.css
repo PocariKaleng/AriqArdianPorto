@@ -1,0 +1,140 @@
+/* Design tokens: the only place values live. Components read these variables, never raw values. */
+:root {
+  /* color: paper */
+  --paper: #F2EDE3;
+  --paper-2: #EEE8DC;          /* second tone of the pixel checker */
+  --paper-3: #FBF8F2;          /* objects on the paper: badge, polaroid, frame inside */
+  --ink: #1B1A17;
+  --ink-2: #3A3832;            /* body text, about 10:1 on paper */
+  --muted: #6B675D;            /* meta, about 4.9:1 on paper */
+  --line: rgb(27 26 23 / .14);
+  --line-strong: rgb(27 26 23 / .85);
+  --accent: #1D6B45;           /* terminal green: status dot, focus, current page, signature; about 5.6:1 */
+  --accent-ink: #F2EDE3;
+  --accent-inv: #4FBF85;       /* the accent on an ink tile (inverse surfaces) */
+  --on-dark: #F2EDE3;          /* text on a surface that stays dark in both themes (the anime card back) */
+  --on-dark-muted: #CFC9BD;
+  --on-dark-accent: #4FBF85;
+  --scrim: rgb(21 20 18 / .88);
+  --checker-dark: rgb(27 26 23 / .014);
+
+  /* pixel sky (decorative canvas behind the page) */
+  --sky-sun: #F6BF45;
+  --sky-sun-edge: #E9962F;
+  --sky-glow: #F5D27E;
+  --sky-moon: #EDE7DB;
+  --sky-moon-mid: #CFC7B6;
+  --sky-moon-shade: #9F988A;
+  --sky-star: #EDE7DB;
+  --sky-cloud: #FFFDF8;
+  --sky-cloud-shade: #E8DFCE;
+  --sky-wind: rgb(27 26 23 / .2);
+  --sky-leaf: #1D6B45;
+  --sky-leaf-2: #4FBF85;
+
+  /* code face */
+  --font-code: "JetBrains Mono", ui-monospace, monospace;
+
+  /* type: two families */
+  --font-display: "Silkscreen", "Courier New", monospace;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --display-weight: 700;
+  --display-stretch: 100%;
+  --display-transform: uppercase;
+  --track-display: -0.01em;
+
+  --fs-display: clamp(3.25rem, 1.6rem + 7vw, 8.5rem);   /* 52 to 136px */
+  --fs-title: clamp(2.25rem, 1.5rem + 3.2vw, 4.5rem);   /* 36 to 72px */
+  --fs-title-s: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);/* 28 to 44px: titles inside a narrow column */
+  --fs-h3: clamp(1.0625rem, 1rem + .3vw, 1.25rem);      /* 17 to 20px */
+  --fs-body: clamp(0.875rem, .85rem + .12vw, 0.9375rem);/* 14 to 15px */
+  --fs-small: 0.8125rem;                                 /* 13px */
+  --fs-read: clamp(1.0625rem, .95rem + .45vw, 1.25rem);  /* 17 to 20px: long-form reading */
+  --fs-lead: clamp(1.25rem, 1.1rem + .6vw, 1.5rem);      /* 20 to 24px: an article's standfirst */
+  --fs-code: clamp(.9375rem, .9rem + .15vw, 1rem);       /* 15 to 16px: code blocks */
+  --fs-micro: 0.75rem;                                   /* 12px, uppercase labels and nav */
+  --lh-display: .88;
+  --lh-title: .95;
+  --lh-body: 1.6;
+  --track-micro: .08em;
+
+  /* space: a 4px scale */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px;
+  --s-7: 48px; --s-8: 64px; --s-9: 96px; --s-10: 128px; --s-11: 160px;
+
+  /* grid */
+  --margin: clamp(16px, 2.5vw, 36px);
+  --gutter: 24px;
+  --cols: 12;
+  --measure: 38ch;
+  --chrome-w: 228px;           /* the fixed badge and nav column */
+  --rail-w: 56px;              /* the right-edge minimap rail */
+
+  /* shape */
+  --radius: 2px;
+  --shadow-paper: 0 1px 1px rgb(27 26 23 / .06), 0 10px 24px -14px rgb(27 26 23 / .28);
+
+  /* motion */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-1: 160ms;
+  --dur-2: 500ms;
+  --dur-3: 700ms;
+  --dur-4: 900ms;
+  --stagger: 70ms;
+
+  /* pixel system */
+  --px: 3px;                   /* one sprite pixel (the rail flag) */
+  --px-lg: 6px;                /* one sprite pixel in the page transition */
+  --px-b: 2px;                 /* the stepped pixel border and its hover offset */
+  --px-cell: 24px;             /* the transition cell = one checker cell of the paper */
+  --dither: 4px;               /* the 2px-checker texture tile (member cells in the timeline) */
+  --tl-gap: 2px;               /* surface gap between timeline cells */
+  --dur-cover: 460ms;          /* page transition: cover */
+  --dur-uncover: 560ms;        /* page transition: uncover */
+  --dur-scan: 520ms;           /* hover: the dither scan across a tile */
+
+  /* writeups shelf: a blocky wooden bookcase with leather-bound books */
+  --tex: 3;                    /* one texture pixel = 3 CSS px */
+  --book-1: #6B3F1F; --book-2: #7E4B26; --book-3: #5A3418; --book-4: #8A5A2E; --book-5: #4C2D17;
+  --book-ink: #F3E7CF;         /* lettering on the leather */
+  --book-edge: #2E1B0E;        /* the dark outline round each book */
+  --book-gold: #D2AA5E;        /* the qualifiers band */
+  --wood-light: #B98650;       /* the bookcase's lit edge */
+  --wood-dark: #3A2414;
+  --wood: #9A6A3A;
+  --book-base: 30px;           /* the thinnest spine */
+  --book-k: .5px;              /* extra spine width per page */
+  --book-pull: 18px;           /* how far a book comes off the shelf */
+  --shelf-h: 350px;            /* the tallest book */
+  --reader-w: 760px;
+  --tap: 48px;                 /* the smallest touch target */
+  --chip-h: 36px;              /* filter chips */
+  --avatar: 40px;
+  --head-w: 900px;             /* article header measure */
+}
+
+/* the night paper (the existing theme toggle keeps working) */
+:root[data-theme="dark"] {
+  --paper: #151412;
+  --paper-2: #1A1916;
+  --paper-3: #1F1E1B;
+  --ink: #EDE7DB;
+  --ink-2: #CFC9BD;
+  --muted: #9C978B;
+  --line: rgb(237 231 219 / .14);
+  --line-strong: rgb(237 231 219 / .8);
+  --accent: #4FBF85;
+  --accent-ink: #151412;
+  --accent-inv: #1D6B45;
+  --checker-dark: rgb(237 231 219 / .018);
+  --sky-glow: #CFC9BD;
+  --sky-cloud: #2B2A26;
+  --sky-cloud-shade: #22211D;
+  --sky-wind: rgb(237 231 219 / .28);
+  --sky-leaf: #4FBF85;
+  --shadow-paper: 0 1px 1px rgb(0 0 0 / .3), 0 10px 24px -14px rgb(0 0 0 / .6);
+}
+
+@media (max-width: 899px) {
+  :root { --gutter: 16px; }
+}

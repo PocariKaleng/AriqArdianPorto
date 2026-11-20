@@ -1,0 +1,93 @@
+/* ---------- the badge: a pixel player card ----------
+   Hover (fine pointer), all on one frame:
+     lead        the card lifts onto its green pixel shadow (160ms, 2 steps; a transition, so leaving retargets)
+     support     the photo drops to coarse pixels and resolves (6, 12, 24, sharp: 70ms each) while a dither
+                 band scans down it (360ms); the name decrypts (pixel.js)
+     decoration  the status square pings once; a block cursor blinks after "Open to team invites"
+   Idle: the status square pings now and then (first after 2.5s, then every 6s; never while hovered), the
+   quiet "available" signal (the choreograph skill's attention-loop rule: small and rare).
+   First page of a visit only: the card prints in from the left with a dither band on the print edge, then the
+   photo resolves and the square pings. On every other page the card is simply there.
+   Keyboard focus gets the lift; reduced motion keeps the colours and drops the movement. */
+.badge {
+  --pxc: var(--line-strong);
+  --b-lift: 0px; --b-shade: 0px;
+  position: relative; overflow: hidden; isolation: isolate;
+  border: 0; border-radius: 0;
+  background: var(--paper-3);
+  transform: translate(var(--b-lift), var(--b-lift));
+  box-shadow:
+    0 calc(var(--px-b) * -1) 0 0 var(--pxc), 0 var(--px-b) 0 0 var(--pxc),
+    calc(var(--px-b) * -1) 0 0 0 var(--pxc), var(--px-b) 0 0 0 var(--pxc),
+    var(--b-shade) var(--b-shade) 0 0 var(--accent);
+  transition: transform var(--dur-1) steps(2), box-shadow var(--dur-1) steps(2);
+}
+.badge > * { position: relative; z-index: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .badge:hover { --b-lift: calc(var(--px-b) * -1); --b-shade: calc(var(--px-b) * 3); transform: translate(var(--b-lift), var(--b-lift)); }
+}
+.badge:focus-visible { --b-lift: calc(var(--px-b) * -1); --b-shade: calc(var(--px-b) * 3); outline-offset: 6px; }
+.badge:active { --b-lift: 0px; --b-shade: 0px; transform: none; }
+
+/* the photo, in its own pixel frame, with a canvas for the coarse frames and a scan band */
+.badge__pic {
+  grid-row: span 2; position: relative; display: block; overflow: hidden;
+  width: var(--s-7); height: var(--s-7);
+  box-shadow: 0 0 0 1px var(--line-strong);
+}
+.badge__pic img { width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
+.badge__pic canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; visibility: hidden; }
+.badge__pic.is-px canvas { visibility: visible; }
+.badge__pic::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 40%;
+  background-image: repeating-conic-gradient(var(--accent-inv) 0 25%, transparent 0 50%);
+  background-size: var(--dither) var(--dither);
+  opacity: 0; transform: translateY(-110%); pointer-events: none;
+}
+.badge.is-scan .badge__pic::after { animation: badge-scan 360ms steps(6, end); }
+@keyframes badge-scan {
+  0% { opacity: .75; transform: translateY(-100%); }
+  88% { opacity: .75; transform: translateY(250%); }
+  100% { opacity: 0; transform: translateY(250%); }
+}
+
+/* the status square: a ping is a pixel ring opening out from it */
+.badge__status .dot { outline: var(--px-b) solid transparent; outline-offset: 0; }
+.badge.is-ping .badge__status .dot { animation: badge-ping 720ms steps(4, end); }
+@keyframes badge-ping {
+  0% { outline-color: var(--accent); outline-offset: 0; }
+  100% { outline-color: transparent; outline-offset: calc(var(--px-b) * 3); }
+}
+/* and a block cursor after the status while the card is hovered */
+.badge__status::after {
+  content: ""; flex: none; width: calc(var(--px) * 2); height: .95em;
+  background: var(--accent); opacity: 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .badge:hover .badge__status::after { animation: badge-blink 1s steps(1) infinite; }
+}
+.badge:focus-visible .badge__status::after { opacity: 1; }
+@keyframes badge-blink { 0%, 59% { opacity: 1; } 60%, 100% { opacity: 0; } }
+
+/* first page of a visit: the card prints in, a dither band riding the print edge */
+.badge::before {
+  content: ""; position: absolute; z-index: 2; top: 0; bottom: 0; left: 0; width: 34%;
+  background-image: repeating-conic-gradient(var(--accent) 0 25%, transparent 0 50%);
+  background-size: var(--dither) var(--dither);
+  opacity: 0; transform: translateX(-110%); pointer-events: none;
+}
+@keyframes badge-print { from { clip-path: inset(-8px 100% -8px -8px); } to { clip-path: inset(-8px -8px -8px -8px); } }
+@keyframes badge-band {
+  0% { opacity: .65; transform: translateX(-100%); }
+  88% { opacity: .65; transform: translateX(194%); }
+  100% { opacity: 0; transform: translateX(194%); }
+}
+.js .badge--boot:not(.is-in) { opacity: 0; }
+.js .badge--boot.is-in { animation: badge-print 420ms steps(7, end) backwards; }
+.js .badge--boot.is-in::before { animation: badge-band 420ms steps(7, end) backwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .badge:hover, .badge:focus-visible { --b-lift: 0px; transform: none; }
+  .badge.is-scan .badge__pic::after, .badge.is-ping .badge__status .dot, .badge:hover .badge__status::after { animation: none; }
+  .js .badge--boot, .js .badge--boot::before { opacity: 1 !important; animation: none !important; }
+}

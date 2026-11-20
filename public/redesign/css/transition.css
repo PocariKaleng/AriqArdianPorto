@@ -1,0 +1,43 @@
+/* Pixel page transition: an ordered-dither wipe on the paper's own 24px cells, carried by the flag. */
+.pt {
+  position: fixed; inset: 0; z-index: 200;
+  pointer-events: none;
+  visibility: hidden;
+}
+.pt.is-active { visibility: visible; }
+.pt.is-covering { pointer-events: auto; cursor: progress; }
+.pt canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+.pt__flag {
+  position: absolute; left: 0; top: 50%;
+  width: calc(var(--px-lg) * 10); height: calc(var(--px-lg) * 12);
+  margin-top: calc(var(--px-lg) * -6);
+  will-change: transform;
+}
+.pt__flag svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.pt__flag .flag__pole { fill: var(--paper); }
+.pt__flag .flag__cloth { fill: var(--accent); }
+.pt__flag .flag__shade { fill: var(--paper); opacity: .35; }
+.pt__flag .flag__b { opacity: 0; }
+/* the flag only waves while the wipe is on screen */
+.pt.is-active .pt__flag .flag__a { animation: flag-a .3s steps(1) infinite; }
+.pt.is-active .pt__flag .flag__b { animation: flag-b .3s steps(1) infinite; }
+
+.pt__label {
+  position: absolute; left: 50%; top: calc(50% + var(--px-lg) * 8);
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--fs-h3);
+  letter-spacing: var(--track-display);
+  color: var(--paper);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity var(--dur-1) steps(2);
+}
+.pt.is-labelled .pt__label { opacity: 1; }
+
+/* before the canvas exists, an incoming page waits behind a plain cover (the head script sets the class) */
+.pt-enter body::after {
+  content: ""; position: fixed; inset: 0; z-index: 199; background: var(--ink);
+}

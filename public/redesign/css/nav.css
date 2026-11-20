@@ -1,0 +1,68 @@
+/* ---------- the menu: a pixel game-menu selector ----------
+   One selector bar, built as the tab-indicator pattern: nav.js lays an inverted copy of the menu over it and
+   clips the copy to the item under the pointer, so the ink bar and its paper text change in the same frame.
+     enter the menu   the bar wipes in from the left over the item       120ms, 3 steps
+     move to another  the bar travels there, edges together               200ms, 4 steps (a transition: retargets mid-way)
+     leave the menu   the bar wipes back out to the left                  100ms, 2 steps (exits are quicker)
+     press            the bar flashes green as the page transition starts
+   A block cursor blinks at the end of the bar while it is out. The green square stays on the current page,
+   so "you are here" and "you are pointing here" never read as the same thing.
+   Keyboard focus places the bar at once, without travel.
+   First page of a visit only: the items arrive in a short wave from the left and the current square plants.
+   The menu is on every page, so on every other page it is simply there. */
+.nav { position: relative; gap: 0; }
+/* the bar's box: padding on both the link and its copy, the negative margin keeps the text where it was */
+.nav a, .nav__hl .nav__i {
+  position: relative;
+  display: flex; align-items: center; gap: var(--s-2);
+  width: max-content; line-height: 1.5;
+  padding: 2px var(--s-5) 2px var(--s-2);
+  margin-left: calc(var(--s-2) * -1);
+}
+
+.nav__hl {
+  position: absolute; inset: 0; z-index: 1;
+  display: grid; align-content: start;
+  pointer-events: none;
+  clip-path: inset(0 100% 100% 0);
+}
+/* the bar replaces the plain hover square; the current page keeps its green one */
+.nav--bar a:not([aria-current="page"]):hover::before { background: transparent; }
+.nav__hl .nav__label { visibility: hidden; }
+.nav__hl .nav__i { background: var(--ink); color: var(--paper); transition: background-color 80ms steps(2, end), color 80ms steps(2, end); }
+.nav__hl .nav__i::before { content: ""; flex: none; width: var(--s-2); height: var(--s-2); background: var(--accent-inv); }
+.nav__hl .nav__i::after {
+  content: ""; position: absolute; right: var(--s-2); top: 50%;
+  width: calc(var(--px) * 2); height: .95em; transform: translateY(-50%);
+  background: var(--accent-inv);
+}
+.nav.is-hot .nav__hl .nav__i::after { animation: nav-blink 1s steps(1) infinite; }
+@keyframes nav-blink { 0%, 59% { opacity: 1; } 60%, 100% { opacity: 0; } }
+.nav__hl.is-wipe { transition: clip-path 120ms steps(3, end); }
+.nav__hl.is-travel { transition: clip-path 200ms steps(4, end); }
+.nav__hl.is-out { transition: clip-path 100ms steps(2, end); }
+/* press: green for the moment the click lands */
+.nav__hl.is-press .nav__i { background: var(--accent); color: var(--accent-ink); }
+.nav__hl.is-press .nav__i::before, .nav__hl.is-press .nav__i::after { background: var(--accent-ink); }
+
+/* first page of a visit: a wave from the left with shrinking gaps, then the current square plants */
+@keyframes nav-pop { from { opacity: 0; transform: translateX(calc(var(--px-b) * -4)); } to { opacity: 1; transform: none; } }
+@keyframes nav-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes nav-plant { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+.nav a:nth-of-type(1) { --d: 40ms; }
+.nav a:nth-of-type(2) { --d: 80ms; }
+.nav a:nth-of-type(3) { --d: 110ms; }
+.nav a:nth-of-type(4) { --d: 130ms; }
+.js .nav--boot:not(.is-in) > .nav__label, .js .nav--boot:not(.is-in) > a { opacity: 0; }
+.js .nav--boot.is-in > .nav__label { animation: nav-fade 200ms steps(2, end) backwards; }
+.js .nav--boot.is-in > a { animation: nav-pop 240ms steps(3, end) backwards; animation-delay: var(--d); }
+.js .nav--boot.is-in > a[aria-current="page"]::before { animation: nav-plant 200ms steps(2, end) backwards; animation-delay: calc(var(--d) + 240ms); }
+
+/* the phone sheet sets its own large type: the copy would not line up there, and touch has no pointing */
+.chrome.is-open .nav__hl { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nav__hl.is-wipe, .nav__hl.is-travel, .nav__hl.is-out { transition: none; }
+  .nav.is-hot .nav__hl .nav__i::after { animation: none; }
+  .js .nav--boot > .nav__label, .js .nav--boot > a, .js .nav--boot > a::before { opacity: 1 !important; animation: none !important; }
+}
