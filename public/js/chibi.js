@@ -99,7 +99,7 @@
     selected_work: 'SecureVault encrypts files right in your browser.',
     latest_notes: 'Palumara is the long one: 17 minutes.',
     biography: "That's me in the photo. Same jacket.",
-    achievements: 'Two podiums so far. Recursion 2.0 was the latest.',
+    achievements: 'Three podiums so far. First place at Schematics 2026!',
     authored: 'I write challenges too. HOLOGY 9 was the last.',
     community: 'I lead Hack It Braw since September 2026.',
     on_repeat: 'Yorushika, Kenshi Yonezu, ZUTOMAYO. On repeat.',
@@ -115,7 +115,7 @@
     the_final_trap: "Careful, there's a trap at the end.",
     solver_and_execution: 'The flag is close now.'
   };
-  var FACTS = ['2 podiums, 6 finals, 1 best writeup.', '11 writeups, 1,131 pages.', 'IT student at Universitas Brawijaya.', 'I lead Hack It Braw.', 'flag{you_found_me}'];
+  var FACTS = ['3 podiums, 6 finals, 1 best writeup.', '11 writeups, 1,131 pages.', 'IT student at Universitas Brawijaya.', 'I lead Hack It Braw.', 'flag{you_found_me}'];
 
   /* ---- DOM: the sprite, the bubble and a fixed pool of effect nodes ---- */
   var STAR = '<svg viewBox="0 0 5 5" shape-rendering="crispEdges"><path d="M2 0h1v2h2v1H3v2H2V3H0V2h2z"/></svg>';
