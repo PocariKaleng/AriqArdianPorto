@@ -1,20 +1,21 @@
-/* Chibi Ariq: the portrait as an anime chibi, then pixelled. Big cel-shaded eyes with a warm iris gradient and
-   two catchlights, a spiky fringe, a blue sheen ring on black hair and an ahoge; the light-blue jacket with dark
-   frog closures, grey joggers, hands in pockets; standing on a grass block in the bottom-right corner.
-   Decoration only (aria-hidden): every fact in its bubbles is already written on the page.
+/* Eizel: Ariq's pixel heroine, the guide in the bottom-right corner. White hair with a red ribbon, red eyes,
+   a black battle dress with a crimson-lined cape and a silver spear, standing on a navy rune stone.
+   The frames are drawn in pixel-characters/site_sprite.py and written into the SPRITE block below.
+   Decoration only (aria-hidden): every fact in her bubbles is already written on the page.
 
    Behaviour (the animate skill's gate: each motion has a job; rare moments may delight):
-     breathes, blinks, the ahoge bobs        alive, not a sticker (a few frames a second)
-     a gloss runs along the hair now and then the anime hair shine
-     eyes follow the cursor (the catchlights) it notices you; fine pointers only
-     hover: looks right at you               it notices you
+     breathes, blinks, the runes pulse        alive, not a sticker (a few frames a second)
+     a glint flares on the spearhead now and then
+     eyes follow the cursor (the catchlights) she notices you; fine pointers only
+     hover: looks right at you               she notices you
      waves at a link you point at            feedback, at most every 8s
      a bubble per section                    a fact from it, once per section, 6s apart, not in the first 2.5s
                                              (the choreograph skill's attention loops)
-     click: hop + speed lines, grin,         rare, so it may delight
-            sparkles at the top of the hop, a fact
-     three quick clicks: a sweat drop        flustered, and a short rest before he plays again
-     sleeps (night, or 40s with no input)    Zzz and a snot bubble that swells with each breath
+     click: hop + speed lines, a grin,       rare, so it may delight
+            the spear raised, sparkles at the top of the hop, a fact
+     three quick clicks: a sweat drop        flustered, and a short rest before she plays again
+     sleeps (night, or 40s with no input)    Zzz, and every rune of the stone lit as a night ward
+   At night her outline gets a thin crimson aura so the black dress still reads on the dark paper.
    Effects follow the create-game-vfx checklist: a fixed pool of nodes, restarted not stacked, cleaned by
    class removal, and a still version under reduced motion. Phones: smaller, ducking out while the page scrolls. */
 (function () {
@@ -25,83 +26,40 @@
   var firstVisit = false;
   try { firstVisit = !sessionStorage.getItem('pt-seen'); } catch (e) { /* storage blocked */ }
 
-  /* ---- the sprite: 30 x 42, one letter per pixel (drawn on a workbench, see the palette below) ---- */
-  var SPRITE = [
-    '.................HD...........',
-    '................HH............',
-    '..........HHHHHHHHHH..........',
-    '........HHHHHHHHHHHHHH........',
-    '.......HHHHhhhhhhhhhHHH.......',
-    '......HHHhHHHHHHHHHHhHHH......',
-    '.....HHHHHHHHHHHHHHHHHHHH.....',
-    '....DHHHHDHHHHHHHHHHDHHHHD....',
-    '....DHHHHHDHHHHHHHHDHHHHHD....',
-    '....DHHHSHHHSHHHHSHHHHSHHD....',
-    '....DHHsSSHHsSHHsSHHsSSHHD....',
-    '....DHsSSSsSSSHsSSSSsSSSHD....',
-    '....DHSEEEEESSSSSSEEEEESHD....',
-    '....DHSESSSSESSSSESSSSESHD....',
-    '....DHSSSSSSSSSSSSSSSSSSHD....',
-    '....DHSSSSSSSSSSSSSSSSSSHD....',
-    '....DHSSSSSSSSSSSSSSSSSSHD....',
-    '....DHSSSSSSSSSSSSSSSSSSHD....',
-    '....DHSSSSSSSSSsSSSSSSSSHD....',
-    '....DHSSSSSSSSSSSSSSSSSSHD....',
-    '.....D.SSSSSSSMMSSSSSSS.D.....',
-    '........sSSSSSSSSSSSSs........',
-    '...........sSSSSSSs...........',
-    '..........LBBssssBBL..........',
-    '........LBBBBNNNNBBBBL........',
-    '......BBBBBBBBbbBBBBBBBB......',
-    '.....LBBBcBBBNNNNBBBcBBBb.....',
-    '.....LBBBcBBBBbbBBBBcBBBb.....',
-    '.....BBBBcBBBBbbBBBBcBBbb.....',
-    '.....BBBBcBBBNNNNBBBcBBbb.....',
-    '.....bBBBcBBBBbbBBBBcBBbb.....',
-    '.....bBBbccBBBbbBBBccbBbc.....',
-    '......cbbbbbbNNNNbbbbbbc......',
-    '.......cccccccccccccccc.......',
-    '........PPPPPPPPPPPPPP........',
-    '........PPPPPPppPPPPPP........',
-    '........PPPPPP..PPPPPP........',
-    '........pPPPPp..pPPPPp........',
-    '........pPPPPp..pPPPPp........',
-    '........KKKKKK..KKKKKK........',
-    '.......KkKKKKK..KkKKKKK.......',
-    '.......KKKKKKK..KKKKKKK.......'
-  ];
-  var SW = 30, UPPER = 34;            // rows 0..33 (head, jacket, hem) rise and fall with the breath
-  var COLORS = {
-    H: '#221C2C', D: '#110E17', h: '#3F4C70', w: '#8495C0',
-    S: '#F7D5C0', s: '#E3A991', R: '#F2989A', E: '#1C1522', M: '#8E4A3F',
-    '1': '#3A2621', '2': '#6F4734', '3': '#B87C50', W: '#FFFFFF',
-    B: '#BAD9F0', b: '#93B3CD', c: '#6D8DAA', L: '#E6F4FD', N: '#3B4760',
-    P: '#BAB7B6', p: '#908C8B', K: '#2B2622', k: '#564C44',
-    G: '#5AAE5F', g: '#7CC77A', T: '#8A5A2E', t: '#6B3F1F', Q: '#CFE8F7'
-  };
-  // the iris under the catchlights, per eye; null keeps the skin
-  var IRIS_L = [['1', '1', '1', '1', 'E'], ['1', '1', '1', '2', '1'], ['2', '1', '1', '2', '2'], ['3', '2', '2', '3', '3'], [null, '3', '3', '3', null]];
-  var IRIS_R = [['E', '1', '1', '1', '1'], ['1', '1', '1', '2', '1'], ['2', '1', '1', '2', '2'], ['3', '2', '2', '3', '3'], [null, '3', '3', '3', null]];
-  var EYE_L = 8, EYE_R = 17, EYE_Y = 13;
-  var RING = { y: 4, x0: 11, x1: 19 };   // the sheen; its sparkle pair rests at x 13-14
-  // the right arm up out of its pocket, two frames of a wave
-  var ARM_UP = [[21, 25, 'B'], [22, 25, 'B'], [22, 24, 'B'], [23, 24, 'b'], [22, 23, 'B'], [23, 23, 'b'], [23, 22, 'B'], [24, 22, 'b'], [23, 21, 'B'], [24, 21, 'b'], [24, 20, 'B'], [25, 20, 'b']];
-  var HAND = [
-    [[24, 19, 'L'], [25, 19, 'L'], [24, 18, 'S'], [25, 18, 'S'], [24, 17, 'S'], [25, 17, 'S'], [23, 18, 'S']],
-    [[25, 19, 'L'], [26, 19, 'L'], [25, 18, 'S'], [26, 18, 'S'], [25, 17, 'S'], [26, 17, 'S'], [26, 16, 'S']]
-  ];
-  var GW = SW + 2, SH = SPRITE.length, GROUND = SH + 1, GH = GROUND + 5;
-  if (SPRITE.some(function (r) { return r.length !== SW; })) return;
+  /* ---- the sprite: body frames, face patches and the rune stone (generated, see the header) ---- */
+  /* @sprite-begin: dibuat oleh pixel-characters/site_sprite.py, jangan diedit dengan tangan */
+  var SPRITE = {"w":48,"h":66,"ground":61,"colors":{"O":"#120F17","h":"#FFFFFF","H":"#E4E1EF","j":"#C1BCD7","D":"#8E87AD","S":"#FCE7DC","s":"#EEC3B2","R":"#F5A0AA","M":"#C24C5D","E":"#2A1320","1":"#5C0E22","2":"#AA172F","3":"#EE4252","W":"#FFFFFF","L":"#FFFFFF","B":"#DFE0EB","b":"#AEB0C5","T":"#4E4760","t":"#302A3C","r":"#1F1B28","V":"#4E4760","n":"#302A3C","v":"#1F1B28","Y":"#F3F5FA","G":"#BEC3D5","g":"#80869F","I":"#BEC3D5","i":"#80869F","A":"#FFE4E9","q":"#EE4252","a":"#7B1533","x":"#141A3C","y":"#1E2A5E","z":"#2C3D7A","u":"#3B4A78","0":"#120F17"},"frames":{"stand0":{"rows":[
+"................................................","................................................","................................................","................................................","................................................","................................................",".......................................O........","......................................OWO.......","......................................OIO.......",".....................................OWIiO......",".....................................OWIiO......","....................................OWWIiiO.....","....................................OWWIiiO.....","....................................OWWIiiO.....","....................................OWWIiiO.....",".....................................OWIiO......",".....................................OWIiO......","......................................OIO.......",".............................OO......OYGgO......","............................OHjO......OV1OO.....","......................OOOOOOHjOO......OGO32O....","....................OOHhhHHHHHHjOO....OVO32O....",".............O.....OHHHhhhhhHHHHjjO...OVOO21O...","............O3O...O2HhhHHHHHHHHHHjjO..OVOO21O...","............O33OOO22HHHHHHHHHHHHHHjjO.OVO.OO....","............O3331221HHHHHHHHHHHHHHjjjOOVO.......","..........OO0330HH21HjHHHHHHHHHHjHHjjDOVO.......","........OO320300HHH1HHjHHHHHHHHjHHHjjDOVO.......",".......O321OO010HHHHHjHHHHjHHHHjHHHjjD0VO.......",".......O2OOO31H0HHHjHHHjHHHjHHHjHHHjjD0V0O......","........O..O31H0HjSSHjSSHjSSHjSSHjSSjD0V0O......","..........O31hH0HjEEEEEESSSSSSEEEEEEjD0V0O......","..........O31hH0HjSE1WW1ESSSSEWW11ESjD0V0O......","..........O2OhH0HjSS1WW21SSSS1WW21SSjD0V0O......","...........OOhH0HjSS21122SSSS21122SSjD0V0O......","...........OhHH0HjSS322W3SSSS322W3SSjD0V0O......","...........OhHH0HjSSS333SSSSSS333SSSjD0V0O......","...........OhHH0HjSSSSSSSSSsSSSSSSSSjD0V0O......","...........OhHH0HjSRRSSSSSSSSSSSSRRSjD0V0O......","...........OhHj0HHjSSSSSSSMMSSSSSSSjjD0G0O......","..........OhHjH0HHjOsSSSSSSSSSSSSsOjjD0VO.......","..........OhHjH0HHjOOLBsSSSSSSsBbOOjjD0VO.......","..........OhjHH0HHjOLBBBb3221BBBbbOjjD0VO.......",".........OhHjH0hHHjnnVnnnB21BnnnvVnjjj0VO.......","........O2hjHH0HHHjYnnnnnGvvGnnnVnGjjD0VO.......","......OO2hHjHj0VHHjnnvnnnvGGvnnnnnnjDD0VO.......",".....O22hHjHj10YGHjGGgnnnGvvGnnnGGGjDg0VO.......","....O21hHjHj110VnnnvOnnnnvGGvnnnvOnnnn0VO.......","...O21hHjHj110Vnnnv00VnnnGvvGnnvv00nnn0VO.......","...O2hHjjj110Vnnnv000VnnnvGGvnnvv0H0Vv0VO.......","...OHjjj111v0VnnvBTTtO222YGGg22210j0nBTTtO......","..O21H11111v0nvvvBTtrOVVVVVVVLBBbn010BTtrO......","..O2111111v11000nBtrrOnvnnnvnBGBbnn010trrO......","..OY111111v111110OOOO3vnn22nnbbbbn2n010VO.......","...OY1111v1111103L333L332LB222B222B2200VO.......","....OYGGGv111110L0LBLVLBL00BLBnBLB0BL00VO.......",".....OOOOY111YGG01000Vnnv0100Vnnv0G00YOVO.......",".........OYGGOOOYG1032222100322221OYGOOVO.......","..........OOO...OOY0Vnnnnv00VnnnnvOOO.OVO.......","..................OVnnnnnvOOVnnnnnvO..OGO.......","..................OgggggggOOgggggggO..OgO......."
+],"head":[12,19],"tip":[39,7]},"stand1":{"rows":[
+"................................................","................................................","................................................","................................................","................................................","................................................",".......................................O........","......................................OWO.......","......................................OIO.......",".....................................OWIiO......",".....................................OWIiO......","....................................OWWIiiO.....","....................................OWWIiiO.....","....................................OWWIiiO.....","....................................OWWIiiO.....",".....................................OWIiO......",".....................................OWIiO......","......................................OIO.......",".....................................OYGgO......",".............................OO.......OV1OO.....","............................OHjO......OGO32O....","......................OOOOOOHjOO......OVO32O....","....................OOHhhHHHHHHjOO....OVOO21O...",".............O.....OHHHhhhhhHHHHjjO...OVOO21O...","............O3O...O2HhhHHHHHHHHHHjjO..OVO.OO....","............O33OOO22HHHHHHHHHHHHHHjjO.OVO.......","............O3331221HHHHHHHHHHHHHHjjjOOVO.......","..........OO0330HH21HjHHHHHHHHHHjHHjjDOVO.......","........OO320300HHH1HHjHHHHHHHHjHHHjjDOVO.......",".......O321OO010HHHHHjHHHHjHHHHjHHHjjD0VO.......",".......O2OOO31H0HHHjHHHjHHHjHHHjHHHjjD0V0O......","........O..O31H0HjSSHjSSHjSSHjSSHjSSjD0V0O......","..........O31hH0HjEEEEEESSSSSSEEEEEEjD0V0O......","..........O31hH0HjSE1WW1ESSSSEWW11ESjD0V0O......","..........O2OhH0HjSS1WW21SSSS1WW21SSjD0V0O......","...........OOhH0HjSS21122SSSS21122SSjD0V0O......","...........OhHH0HjSS322W3SSSS322W3SSjD0V0O......","...........OhHH0HjSSS333SSSSSS333SSSjD0V0O......","...........OhHH0HjSSSSSSSSSsSSSSSSSSjD0V0O......","...........OhHH0HjSRRSSSSSSSSSSSSRRSjD0G0O......","...........OhHj0HHjSSSSSSSMMSSSSSSSjjD0V0O......","..........OhHjH0HHjOsSSSSSSSSSSSSsOjjD0VO.......","..........OhHjH0HHjOOLBsSSSSSSsBbOOjjD0VO.......","..........OhjHH0HHjOLBBBb3221BBBbbOjjD0VO.......",".........OhHjH0hHHjnnVnnnB21BnnnvVnjjj0VO.......","........O2hjHH0HHHjYnnnnnGvvGnnnVnGjjD0VO.......","......OO2hHjHj0VHHjnnvnnnvGGvnnnnnnjDD0VO.......",".....O22hHjHj10YGHjGGgnnnGvvGnnnGGGjDg0VO.......","....O21hHjHj110VnnnvOnnnnvGGvnnnvOnnnn0VO.......","...O21hHjHj110Vnnnv00VnnnGvvGnnvv00nnn0VO.......","...O2hHjjj110Vnnnv000VnnnvGGvnnvv0H0Vv0VO.......","...OHjjj111v0VnnvBTTtO222YGGg22210j0nBTTtO......","..O21H11111v0nvvvBTtrOVVVVVVVLBBbn010BTtrO......","..O2111111v11000nBtrrOnvnnnvnBGBbnn010trrO......","..OY111111v111110OOOO3vnn22nnbbbbn2n010VO.......","...OY1111v1111103B333B332BL222L222L2200VO.......","....OYGGGv111110B0BLBVBLB00LBLnLBL0LB00VO.......",".....OOOOY111YGG010032222100322221000YOVO.......",".........OYGGOOOYG10Vnnnnv00VnnnnvOYGOOVO.......","..........OOO...OO0Vnnnnnv00VnnnnnvOO.OGO.......","..................OgggggggOOgggggggO..OgO......."
+],"head":[12,20],"tip":[39,7]},"wave0":{"rows":[
+"................................................","................................................","................................................","................................................","................................................","................................................",".......................................O........","......................................OWO.......","......................................OIO.......",".....................................OWIiO......",".....................................OWIiO......","....................................OWWIiiO.....","....................................OWWIiiO.....","....................................OWWIiiO.....","....................................OWWIiiO.....",".....................................OWIiO......",".....................................OWIiO......","......................................OIO.......",".............................OO......OYGgO......","............................OHjO......OV1OO.....","......................OOOOOOHjOO......OGO32O....","....................OOHhhHHHHHHjOO....OVO32O....",".............O.....OHHHhhhhhHHHHjjO...OVOO21O...","............O3O...O2HhhHHHHHHHHHHjjO..OVOO21O...","............O33OOO22HHHHHHHHHHHHHHjjO.OVO.OO....","............O3331221HHHHHHHHHHHHHHjjjOOVO.......","..........OO0330HH21HjHHHHHHHHHHjHHjjDOVO.......","........OO320300HHH1HHjHHHHHHHHjHHHjjDOVO.......",".......O321OO010HHHHHjHHHHjHHHHjHHHjjD0VO.......",".......O2OOO31H0HHHjHHHjHHHjHHHjHHHjjD0V0O......","........O..O31H0HjSSHjSSHjSSHjSSHjSSjD0V0O......","..........O31hH0HjEEEEEESSSSSSEEEEEEjD0V0O......","..........O31hH0HjSE1WW1ESSSSEWW11ESjD0V0O......","..........O2OhH0HjSS1WW21SSSS1WW21SSjD0V0O......","...........OOhH0HjSS21122SSSS21122SSjD0V0O......","...........OhHH0HjSS322W3SSSS322W3SSjD0V0O......","...........O00H0HjSSS333SSSSSS333SSSjD0V0O......","..........OTTt00HjSSSSSSSSSsSSSSSSSSjD0V0O......","..........OTtr00HjSRRSSSSSSSSSSSSRRSjD0V0O......","..........Otrr00HHjSSSSSSSMMSSSSSSSjjD0G0O......","..........OBBB00HHjOsSSSSSSSSSSSSsOjjD0VO.......","..........OnVVn0HHjOOLBsSSSSSSsBbOOjjD0VO.......","..........O0Vnv0HHjOLBBBb3221BBBbbOjjD0VO.......",".........Oh0VnvhHHjnnVnnnB21BnnnvVnjjj0VO.......","........O2h0VnnHHHjYnnnnnGvvGnnnVnGjjD0VO.......","......OO2hH0nvnVHHjnnvnnnvGGvnnnnnnjDD0VO.......",".....O22hHjH00nYGHjGGgnnnGvvGnnnGGGjDg0VO.......","....O21hHjHj11000nvvOnnnnvGGvnnnvOnnnn0VO.......","...O21hHjHj1111110000VnnnGvvGnnvv00nnn0VO.......","...O2hHjjj11111111110VnnnvGGvnnvv0H0Vv0VO.......","...OHjjj111v11111v1003222YGGg22210j0nBTTtO......","..O21H11111v1111v10VVVVVVVVVVLBBbn010BTtrO......","..O2111111v11111v0VnnnnvnnnvnBGBbnn010trrO......","..OY111111v1111103nnn3vnn22nnbbbbn2n010VO.......","...OY1111v1111103L333L332LB222B222B2200VO.......","....OYGGGv111110L0LBLVLBL00BLBnBLB0BL00VO.......",".....OOOOY111YGG01000Vnnv0100Vnnv0G00YOVO.......",".........OYGGOOOYG1032222100322221OYGOOVO.......","..........OOO...OOY0Vnnnnv00VnnnnvOOO.OVO.......","..................OVnnnnnvOOVnnnnnvO..OGO.......","..................OgggggggOOgggggggO..OgO......."
+],"head":[12,19],"tip":[39,7]},"wave1":{"rows":[
+"................................................","................................................","................................................","................................................","................................................","................................................",".......................................O........","......................................OWO.......","......................................OIO.......",".....................................OWIiO......",".....................................OWIiO......","....................................OWWIiiO.....","....................................OWWIiiO.....","....................................OWWIiiO.....","....................................OWWIiiO.....",".....................................OWIiO......",".....................................OWIiO......","......................................OIO.......",".............................OO......OYGgO......","............................OHjO......OV1OO.....","......................OOOOOOHjOO......OGO32O....","....................OOHhhHHHHHHjOO....OVO32O....",".............O.....OHHHhhhhhHHHHjjO...OVOO21O...","............O3O...O2HhhHHHHHHHHHHjjO..OVOO21O...","............O33OOO22HHHHHHHHHHHHHHjjO.OVO.OO....","............O3331221HHHHHHHHHHHHHHjjjOOVO.......","..........OO0330HH21HjHHHHHHHHHHjHHjjDOVO.......","........OO320300HHH1HHjHHHHHHHHjHHHjjDOVO.......",".......O321OO010HHHHHjHHHHjHHHHjHHHjjD0VO.......",".......O2OOO31H0HHHjHHHjHHHjHHHjHHHjjD0V0O......","........O..O31H0HjSSHjSSHjSSHjSSHjSSjD0V0O......","..........O31hH0HjEEEEEESSSSSSEEEEEEjD0V0O......","..........O31hH0HjSE1WW1ESSSSEWW11ESjD0V0O......","..........O2OhH0HjSS1WW21SSSS1WW21SSjD0V0O......","...........OOhH0HjSS21122SSSS21122SSjD0V0O......","...........OhHH0HjSS322W3SSSS322W3SSjD0V0O......","...........OhHH0HjSSS333SSSSSS333SSSjD0V0O......","........OOOOhHH0HjSSSSSSSSSsSSSSSSSSjD0V0O......",".......OTTtOhHH0HjSRRSSSSSSSSSSSSRRSjD0V0O......",".......OTtrB0Hj0HHjSSSSSSSMMSSSSSSSjjD0G0O......",".......OtrrB0jH0HHjOsSSSSSSSSSSSSsOjjD0VO.......","........OBBVn0H0HHjOOLBsSSSSSSsBbOOjjD0VO.......",".........Onnnn00HHjOLBBBb3221BBBbbOjjD0VO.......",".........O0VnnnhHHjnnVnnnB21BnnnvVnjjj0VO.......","........O20nnnnHHHjYnnnnnGvvGnnnVnGjjD0VO.......","......OO2hH0nvnVHHjnnvnnnvGGvnnnnnnjDD0VO.......",".....O22hHjH00nYGHjGGgnnnGvvGnnnGGGjDg0VO.......","....O21hHjHj11000nvvOnnnnvGGvnnnvOnnnn0VO.......","...O21hHjHj1111110000VnnnGvvGnnvv00nnn0VO.......","...O2hHjjj11111111110VnnnvGGvnnvv0H0Vv0VO.......","...OHjjj111v11111v1003222YGGg22210j0nBTTtO......","..O21H11111v1111v10VVVVVVVVVVLBBbn010BTtrO......","..O2111111v11111v0VnnnnvnnnvnBGBbnn010trrO......","..OY111111v1111103nnn3vnn22nnbbbbn2n010VO.......","...OY1111v1111103L333L332LB222B222B2200VO.......","....OYGGGv111110L0LBLVLBL00BLBnBLB0BL00VO.......",".....OOOOY111YGG01000Vnnv0100Vnnv0G00YOVO.......",".........OYGGOOOYG1032222100322221OYGOOVO.......","..........OOO...OOY0Vnnnnv00VnnnnvOOO.OVO.......","..................OVnnnnnvOOVnnnnnvO..OGO.......","..................OgggggggOOgggggggO..OgO......."
+],"head":[12,19],"tip":[39,7]},"cheer":{"rows":[
+"................................................","................................................","........................................O.......",".......................................OWO......",".......................................OIO......","......................................OWIiO.....","......................................OWIiO.....",".....................................OWWIiiO....",".....................................OWWIiiO....",".....................................OWWIiiO....",".....................................OWWIiiO....","......................................OWIiO.....","......................................OWIiO.....",".......................................OIO......","......................................OYGgO.....",".......................................OV1OO....",".......................................OGO32O...",".......................................OVO32O...",".............................OO........OVOO21O..","............................OHjO.......OVOO21O..","......................OOOOOOHjOO.......OVO.OO...","....................OOHhhHHHHHHjOO.....OVO......",".............O.....OHHHhhhhhHHHHjjO....OVO......","............O3O...O2HhhHHHHHHHHHHjjO...OVO......","............O33OOO22HHHHHHHHHHHHHHjjO..OVO......","............O3331221HHHHHHHHHHHHHHjjjO.OVO......","..........OO0330HH21HjHHHHHHHHHHjHHjjDOOVO......","........OO320300HHH1HHjHHHHHHHHjHHHjjDOOVO......",".......O321OO010HHHHHjHHHHjHHHHjHHHjjD00VO......",".......O2OOO31H0HHHjHHHjHHHjHHHjHHHjjD00VO......","........O..O31H0HjSSHjSSHjSSHjSSHjSSjD00VO......","..........O31hH0HjEEEEEESSSSSSEEEEEEjD00VO......","..........O31hH0HjSE1WW1ESSSSEWW11ESjD00VO......","..........O2OhH0HjSS1WW21SSSS1WW21SSjD00VO......",".........OOOOhH0HjSS21122SSSS21122SSjD00VO......","........OTTt0HH0HjSS322W3SSSS322W3SSjD00GO......","........OTtr0HH0HjSSS333SSSSSS333SSSjD00VO......","........OtrrB0H0HjSSSSSSSSSsSSSSSSSSjD00VO......","........OBBBn0H0HjSRRSSSSSSSSSSSSRRSjD00VO......",".........OVVv0j0HHjSSSSSSSMMSSSSSSSjjD00VO......",".........OVnnn00HHjOsSSSSSSSSSSSSsOjjD0TTtO.....",".........Onnnv00HHjOOLBsSSSSSSsBbOOjjD0TtrO.....","..........OVnnn0HHjOLBBBb3221BBBbbOjjDBtrrO.....",".........O0nvnnhHHjnnVnnnB21BnnnvVnjjjD0V0O.....","........O2h00nnHHHjYnnnnnGvvGnnnVnGjjDD0VO......","......OO2hHjH0nVHHjnnvnnnvGGvnnnnnnjDDv0VO......",".....O22hHjHj10YGHjGGgnnnGvvGnnnGGGjDggOVO......","....O21hHjHj11100nvvOnnnnvGGvnnnvOnvv00OVO......","...O21hHjHj1111110000VnnnGvvGnnvv00001vOVO......","...O2hHjjj11111111110VnnnvGGvnnvv0Hj11vOVO......","...OHjjj111v11111v1003222YGGg22210j111vOVO......","..O21H11111v1111v10VVVVVVVVVVLBBbn0111vOVO......","..O2111111v11111v0VnnnnvnnnvnBGBbnn011vOVO......","..OY111111v1111103nnn3vnn22nnbbbbn2n01vOVO......","...OY1111v1111103L333L332LB222B222B220vOVO......","....OYGGGv111110L0LBLVLBL00BLBnBLB0BL0YOGO......",".....OOOOY111YGG01000Vnnv0100Vnnv0G00YOOgO......",".........OYGGOOOYG1032222100322221OYGO..O.......","..........OOO...OOY0Vnnnnv00VnnnnvOOO...........","..................OVnnnnnvOOVnnnnnvO............","..................OgggggggOOgggggggO............"
+],"head":[12,19],"tip":[40,3]}},"plate":["zuuuuzuuuuzuuuuzuuuuzuuuuzuuuuzuuuuzuuuuzuuuuzuu","zzyzzzzzyzzzzzyzzzzzyzzzzzyzzzzzyzzzzzyzzzzzyzzz","xyyaaayyyyaaayyxyaaaxyyyaaayyyxaaayxyyaaayyyyxyy","xyyyaxyyyyxayyyxyyayxyyyyayyyyxyayyxyyyaxyyyyxyy","xyyyyxyyyyxyyyyxyyyyxyyyyxyyyyxyyyyxyyyyxyyyyxyy"],"face":{"x":6,"y":12,"w":18,"h":10},"faces":{"blink":["SSSSSSSSSSSSSSSSSS","SSSSSSSSSSSSSSSSSS","SSSSSSSSSSSSSSSSSS","SSEEEEESSSSEEEEESS","SESSSSSSSSSSSSSSES","SSSSSSSSSSSSSSSSSS","SSSSSSSSSsSSSSSSSS","SRRSSSSSSSSSSSSRRS","jSSSSSSSMMSSSSSSSj","j.sSSSSSSSSSSSSs.j"],"happy":["SSSSSSSSSSSSSSSSSS","SSSSSSSSSSSSSSSSSS","SSSEEESSSSSSEEESSS","SSESSSESSSSESSSESS","SSSSSSSSSSSSSSSSSS","SSSSSSSSSSSSSSSSSS","SSSSSSSSSsSSSSSSSS","SRRSSSSSSSSSSSSRRS","jSSSSSSMMMMSSSSSSj","j.sSSSSSRRSSSSSs.j"],"sleep":["SSSSSSSSSSSSSSSSSS","SSSSSSSSSSSSSSSSSS","SSSSSSSSSSSSSSSSSS","SSESSSESSSSESSSESS","SSSEEESSSSSSEEESSS","SSSSSSSSSSSSSSSSSS","SSSSSSSSSsSSSSSSSS","SRRSSSSSSSSSSSSRRS","jSSSSSSSMMSSSSSSSj","j.sSSSSSSSSSSSSs.j"],"yawn":["SSSSSSSSSSSSSSSSSS","SSSSSSSSSSSSSSSSSS","SSSSSSSSSSSSSSSSSS","SSESSSESSSSESSSESS","SSSEEESSSSSSEEESSS","SSSSSSSSSSSSSSSSSS","SSSSSSSSSsSSSSSSSS","SRRSSSSSSSSSSSSRRS","jSSSSSSSMMSSSSSSSj","j.sSSSSSMMSSSSSs.j"],"shout":["EEEEEESSSSSSEEEEEE","SE1WW1ESSSSEWW11ES","SS1WW21SSSS1WW21SS","SS21122SSSS21122SS","SS322W3SSSS322W3SS","SSS333SSSSSS333SSS","SSSSSSSSSsSSSSSSSS","SRRSSSSSSSSSSSSRRS","jSSSSSSSMMSSSSSSSj","j.sSSSSSMMSSSSSs.j"],"o00":["EEEEEESSSSSSEEEEEE","SEWW11ESSSSWW111ES","SSWW121SSSSWW121SS","SS21122SSSS21122SS","SS32W33SSSS32W33SS","SSS333SSSSSS333SSS","SSSSSSSSSsSSSSSSSS","SRRSSSSSSSSSSSSRRS","jSSSSSSSMMSSSSSSSj","j.sSSSSSSSSSSSSs.j"],"o01":["EEEEEESSSSSSEEEEEE","SE1111ESSSSE1111ES","SSWW121SSSSWW121SS","SSWW122SSSSWW122SS","SS32W33SSSS32W33SS","SSS333SSSSSS333SSS","SSSSSSSSSsSSSSSSSS","SRRSSSSSSSSSSSSRRS","jSSSSSSSMMSSSSSSSj","j.sSSSSSSSSSSSSs.j"],"o10":["EEEEEESSSSSSEEEEEE","SE1WW1ESSSSEWW11ES","SS1WW21SSSS1WW21SS","SS21122SSSS21122SS","SS322W3SSSS322W3SS","SSS333SSSSSS333SSS","SSSSSSSSSsSSSSSSSS","SRRSSSSSSSSSSSSRRS","jSSSSSSSMMSSSSSSSj","j.sSSSSSSSSSSSSs.j"],"o11":["EEEEEESSSSSSEEEEEE","SE1111ESSSSE1111ES","SS1WW21SSSS1WW21SS","SS2WW22SSSS2WW22SS","SS322W3SSSS322W3SS","SSS333SSSSSS333SSS","SSSSSSSSSsSSSSSSSS","SRRSSSSSSSSSSSSRRS","jSSSSSSSMMSSSSSSSj","j.sSSSSSSSSSSSSs.j"],"o20":["EEEEEESSSSSSEEEEEE","SE11WWESSSSE1WW1ES","SS11WW1SSSS11WW1SS","SS21122SSSS21122SS","SS3223WSSSS3223WSS","SSS333SSSSSS333SSS","SSSSSSSSSsSSSSSSSS","SRRSSSSSSSSSSSSRRS","jSSSSSSSMMSSSSSSSj","j.sSSSSSSSSSSSSs.j"],"o21":["EEEEEESSSSSSEEEEEE","SE1111ESSSSE1111ES","SS11WW1SSSS11WW1SS","SS21WW2SSSS21WW2SS","SS3223WSSSS3223WSS","SSS333SSSSSS333SSS","SSSSSSSSSsSSSSSSSS","SRRSSSSSSSSSSSSRRS","jSSSSSSSMMSSSSSSSj","j.sSSSSSSSSSSSSs.j"]}};
+  /* @sprite-end */
+  var GW = SPRITE.w, GH = SPRITE.h, GROUND = SPRITE.ground, FACE = SPRITE.face;
+  var HEAD = SPRITE.frames.stand0.head;
+  var RUNES = [];                      // the rune stone's glyph cells, one glyph per entry
+  SPRITE.plate.forEach(function (row, j) {
+    for (var x = 0; x < row.length; x++) if (row[x] === 'a') {
+      var g = Math.floor(x / 7);
+      (RUNES[g] = RUNES[g] || []).push([x, GROUND + j]);
+    }
+  });
+  RUNES = RUNES.filter(Boolean);
 
   /* ---- what the bubble says: facts from each section of each page ---- */
   var SAYS = {
-    hello_world: "Hi! I'm Ariq. Crypto and blockchain CTFs, mostly.",
+    hello_world: "Hi, I'm Eizel! Ariq does crypto and blockchain CTFs, mostly.",
     selected_work: 'SecureVault encrypts files right in your browser.',
     latest_notes: 'Palumara is the long one: 17 minutes.',
-    biography: "That's me in the photo. Same jacket.",
+    biography: "That's Ariq in the photo. I keep watch down here.",
     achievements: 'Three podiums so far. First place at Schematics 2026!',
-    authored: 'I write challenges too. HOLOGY 9 was the last.',
-    community: 'I lead Hack It Braw since September 2026.',
+    authored: 'He writes challenges too. HOLOGY 9 was the last.',
+    community: 'Ariq leads Hack It Braw since September 2026.',
     on_repeat: 'Yorushika, Kenshi Yonezu, ZUTOMAYO. On repeat.',
     anime: 'Evangelion and Death Note, always.',
     writeups: '11 reports, 1,131 pages. Pull one off the shelf!',
@@ -115,7 +73,7 @@
     the_final_trap: "Careful, there's a trap at the end.",
     solver_and_execution: 'The flag is close now.'
   };
-  var FACTS = ['3 podiums, 6 finals, 1 best writeup.', '11 writeups, 1,131 pages.', 'IT student at Universitas Brawijaya.', 'I lead Hack It Braw.', 'flag{you_found_me}'];
+  var FACTS = ['3 podiums, 6 finals, 1 best writeup.', '11 writeups, 1,131 pages.', 'Ariq studies IT at Universitas Brawijaya.', 'Ariq leads Hack It Braw.', 'flag{you_found_eizel}'];
 
   /* ---- DOM: the sprite, the bubble and a fixed pool of effect nodes ---- */
   var STAR = '<svg viewBox="0 0 5 5" shape-rendering="crispEdges"><path d="M2 0h1v2h2v1H3v2H2V3H0V2h2z"/></svg>';
@@ -124,10 +82,14 @@
   var el = document.createElement('div');
   el.className = 'chibi';
   el.setAttribute('aria-hidden', 'true');
+  // the CSS places the bubble tail, the "!" and the Zzz from the sprite size and where the head sits
+  el.style.setProperty('--sw', GW); el.style.setProperty('--sh', GH);
+  el.style.setProperty('--hx', HEAD[0]); el.style.setProperty('--hy', HEAD[1]);
   el.innerHTML =
     '<p class="chibi__bubble"><span class="chibi__text"></span></p>' +
     '<div class="chibi__body">' +
       '<canvas class="chibi__sprite" width="' + GW + '" height="' + GH + '"></canvas>' +
+      '<span class="chibi__hit"></span>' +
       '<span class="chibi__fx chibi__star chibi__star--1">' + STAR + '</span><span class="chibi__fx chibi__star chibi__star--2">' + STAR + '</span>' +
       '<span class="chibi__fx chibi__star chibi__star--3">' + STAR + '</span><span class="chibi__fx chibi__star chibi__star--4">' + STAR + '</span>' +
       '<span class="chibi__fx chibi__note chibi__note--1">' + NOTE + '</span><span class="chibi__fx chibi__note chibi__note--2">' + NOTE + '</span>' +
@@ -143,88 +105,69 @@
   var text = el.querySelector('.chibi__text');
   var img = ctx.createImageData(GW, GH);
   var RGB = {};
-  Object.keys(COLORS).forEach(function (k) { var h = COLORS[k]; RGB[k] = [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; });
+  Object.keys(SPRITE.colors).forEach(function (k) { var h = SPRITE.colors[k]; RGB[k] = [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; });
 
   /* ---- state ---- */
   var s = {
-    breath: 0, blink: false, wave: -1, look: [0, 0], mood: 'idle',   // idle | happy | sleep | yawn | shy
-    asleep: false, sheen: -1, snot: 0, lastInput: Date.now(), lastBubble: 0, said: {}, ready: false, current: null
+    breath: 0, blink: false, wave: -1, look: [0, 0], mood: 'idle',   // idle | happy | sleep | yawn | shy | flustered
+    cheer: false, asleep: false, sheen: -1, rune: 0, lastInput: Date.now(), lastBubble: 0, said: {}, ready: false, current: null
   };
   function night() { return root.getAttribute('data-theme') === 'dark'; }
 
-  /* ---- drawing: compose the grid, outline it, stand it on the block ---- */
+  /* ---- drawing: pick a body frame, lay the face patch on it, add the glint, the runes and the stone ---- */
+  var GLINT = [                                        // the spearhead glint: grows, flares, fades
+    [[0, 0, 'A']],
+    [[0, 0, 'A'], [0, -1, 'Q'], [0, 1, 'Q'], [-1, 0, 'Q'], [1, 0, 'Q']],
+    [[0, 0, 'A'], [0, -1, 'A'], [0, 1, 'A'], [-1, 0, 'A'], [1, 0, 'A'], [0, -2, 'Q'], [0, 2, 'Q'], [-2, 0, 'Q'], [2, 0, 'Q']],
+    [[0, 0, 'A'], [0, -1, 'Q'], [0, 1, 'Q'], [-1, 0, 'Q'], [1, 0, 'Q']],
+    [[0, 0, 'Q']]
+  ];
+  function frameName() {
+    if (s.wave >= 0) return 'wave' + s.wave;
+    if (s.cheer && s.mood === 'happy') return 'cheer';
+    return 'stand' + s.breath;
+  }
+  function faceName() {
+    if (s.mood === 'sleep') return 'sleep';
+    if (s.mood === 'yawn') return 'yawn';
+    if (s.mood === 'happy') return 'happy';
+    if (s.mood === 'flustered') return 'shout';
+    if (s.blink) return 'blink';
+    return 'o' + (s.look[0] + 1) + s.look[1];
+  }
   function compose() {
-    var grid = [], x, y, i, j;
-    for (y = 0; y < GH; y++) grid.push(new Array(GW).fill(null));
-    var dy = s.breath;
-    function put(px, py, c) { px += 1; py += 1; if (px >= 0 && px < GW && py >= 0 && py < GH) grid[py][px] = c; }
-    for (var r = SH - 1; r >= 0; r--) {
-      var off = r < UPPER ? dy : 0;
-      for (x = 0; x < SW; x++) { var c = SPRITE[r][x]; if (c !== '.') put(x, r + off, c); }
-    }
-    // the ahoge bobs a pixel with the breath
-    if (dy && !reduce) { put(17, dy, null); put(18, dy, null); put(18, dy, 'H'); put(19, dy, 'D'); }
-    // the sheen ring, and its sparkle (resting, or running along it)
-    var sx = s.sheen >= 0 ? RING.x0 + s.sheen : 13;
-    if (sx + 1 <= RING.x1) { put(sx, RING.y + dy, 'w'); put(sx + 1, RING.y + dy, 'w'); }
-    // the waving arm leaves its pocket
-    if (s.wave >= 0) {
-      // the jacket's side stays; only the arm goes up
-      for (y = 26; y <= 31; y++) { put(21, y + dy, 'B'); put(22, y + dy, 'b'); put(23, y + dy, 'c'); put(24, y + dy, null); }
-      ARM_UP.concat(HAND[s.wave]).forEach(function (p) { put(p[0], p[1] + dy, p[2]); });
-    }
-    // eyes
-    var closed = s.mood === 'sleep' || s.mood === 'yawn' || s.mood === 'happy' || s.blink;
-    [[EYE_L, IRIS_L, 7], [EYE_R, IRIS_R, 22]].forEach(function (e) {
-      var ex = e[0], ey = EYE_Y + dy, iris = e[1], flick = e[2];
-      if (!closed) {
-        for (j = 0; j < 5; j++) for (i = 0; i < 5; i++) if (iris[j][i]) put(ex + i, ey + j, iris[j][i]);
-        var lx = s.look[0], hy = s.look[1] > 0 ? 1 : 0;
-        put(ex + 1 + lx, ey + hy, 'W'); put(ex + 2 + lx, ey + hy, 'W'); put(ex + 1 + lx, ey + 1 + hy, 'W'); put(ex + 2 + lx, ey + 1 + hy, 'W');
-        put(ex + 3 + lx, ey + 3, 'W');                                     // the small catchlight
-        return;
-      }
-      // closed: the lash comes down; clear the eye to skin first
-      for (j = -1; j <= 4; j++) for (i = -1; i <= 5; i++) { var cx = ex + i; if (cx >= 7 && cx <= 22 && !(cx > 12 && cx < 17)) put(cx, ey + j, 'S'); }
-      if (s.mood === 'happy') {                                             // ^ ^
-        put(ex + 1, ey + 1, 'E'); put(ex + 2, ey + 1, 'E'); put(ex + 3, ey + 1, 'E'); put(ex, ey + 2, 'E'); put(ex + 4, ey + 2, 'E');
-      } else if (s.mood === 'sleep' || s.mood === 'yawn') {                 // a soft downward curve
-        put(ex, ey + 2, 'E'); put(ex + 4, ey + 2, 'E'); put(ex + 1, ey + 3, 'E'); put(ex + 2, ey + 3, 'E'); put(ex + 3, ey + 3, 'E');
-      } else {                                                              // a blink
-        for (i = 0; i < 5; i++) put(ex + i, ey + 2, 'E');
-        put(flick, ey + 3, 'E');                                        // the outer lashes point down
-      }
+    var f = SPRITE.frames[frameName()], grid = [], x, y, i, j;
+    f.rows.forEach(function (r) { grid.push(r.split('')); });
+    SPRITE.plate.forEach(function (r) { grid.push(r.split('')); });
+    var face = SPRITE.faces[faceName()], hx = f.head[0] + FACE.x, hy = f.head[1] + FACE.y;
+    for (j = 0; j < face.length; j++) for (i = 0; i < face[j].length; i++) if (face[j][i] !== '.') grid[hy + j][hx + i] = face[j][i];
+    if (s.sheen >= 0 && GLINT[s.sheen]) GLINT[s.sheen].forEach(function (p) {
+      x = f.tip[0] + p[0]; y = f.tip[1] + p[1];
+      if (y >= 0 && y < GROUND && x >= 0 && x < GW) grid[y][x] = p[2];
     });
-    // mouth and cheeks
-    if (s.mood === 'happy') { for (i = 13; i <= 16; i++) put(i, 20 + dy, 'M'); put(14, 21 + dy, 'R'); put(15, 21 + dy, 'R'); }
-    else if (s.mood === 'yawn') { put(14, 21 + dy, 'M'); put(15, 21 + dy, 'M'); }
-    // asleep: the snot bubble swells and shrinks with the breath
-    if (s.asleep && s.snot) {
-      var bx = 16, by = 19 + dy;
-      if (s.snot === 1) put(bx, by, 'Q');
-      else if (s.snot === 2) { put(bx, by - 1, 'W'); put(bx + 1, by - 1, 'Q'); put(bx, by, 'Q'); put(bx + 1, by, 'Q'); }
-      else { for (j = -2; j <= 0; j++) for (i = 0; i <= 2; i++) put(bx + i, by + j, 'Q'); put(bx, by - 2, 'W'); put(bx + 1, by - 2, 'W'); put(bx, by - 1, 'W'); }
-    }
-    // outline every empty cell touching the figure, then the grass block edge to edge
-    var outline = [];
-    for (y = 0; y < GROUND; y++) for (x = 0; x < GW; x++) {
-      if (grid[y][x]) continue;
-      if ((y > 0 && grid[y - 1][x]) || (y < GH - 1 && grid[y + 1][x]) || (x > 0 && grid[y][x - 1]) || (x < GW - 1 && grid[y][x + 1])) outline.push([x, y]);
-    }
-    outline.forEach(function (p) { grid[p[1]][p[0]] = 'O'; });
-    for (y = GROUND; y < GH; y++) for (x = 0; x < GW; x++) {
-      var k = y - GROUND;
-      grid[y][x] = k === 0 ? ((x * 7) % 3 ? 'G' : 'g') : k === 1 ? ((x * 5 + 2) % 4 ? 'G' : 'T') : (((x * 3 + y * 5) % 5) ? 'T' : 't');
+    // one glyph of the stone lit at a time, travelling left to right; all lit while she sleeps (a night ward)
+    var n = RUNES.length;
+    RUNES.forEach(function (cells, g) {
+      var c = s.asleep || reduce ? 'q' : g === s.rune % n ? 'Q' : g === (s.rune + n - 1) % n ? 'q' : 'a';
+      cells.forEach(function (p) { grid[p[1]][p[0]] = c; });
+    });
+    // night: a crimson aura around the outline, so the black dress reads on the dark paper
+    if (night()) {
+      var aura = [];
+      for (y = 0; y < GROUND; y++) for (x = 0; x < GW; x++) {
+        if (grid[y][x] !== '.') continue;
+        if ((y > 0 && grid[y - 1][x] === 'O') || (y < GROUND - 1 && grid[y + 1][x] === 'O') ||
+            (x > 0 && grid[y][x - 1] === 'O') || (x < GW - 1 && grid[y][x + 1] === 'O')) aura.push([x, y]);
+      }
+      aura.forEach(function (p) { grid[p[1]][p[0]] = 'a'; });
     }
     return grid;
   }
   function draw() {
     var grid = compose(), d = img.data;
-    var line = night() ? [237, 231, 219] : [27, 26, 23];
     for (var y = 0; y < GH; y++) for (var x = 0; x < GW; x++) {
-      var i4 = (y * GW + x) * 4, c = grid[y][x];
-      if (!c) { d[i4 + 3] = 0; continue; }
-      var v = c === 'O' ? line : RGB[c];
+      var i4 = (y * GW + x) * 4, v = RGB[grid[y][x]];
+      if (!v) { d[i4 + 3] = 0; continue; }
       d[i4] = v[0]; d[i4 + 1] = v[1]; d[i4 + 2] = v[2]; d[i4 + 3] = 255;
     }
     ctx.putImageData(img, 0, 0);
@@ -267,11 +210,11 @@
     clearTimeout(moodTimer);
     s.mood = m;
     draw();
-    if (ms) moodTimer = setTimeout(function () { s.mood = s.asleep ? 'sleep' : (body.matches(':hover') ? 'shy' : 'idle'); draw(); }, ms);
+    if (ms) moodTimer = setTimeout(function () { s.cheer = false; s.mood = s.asleep ? 'sleep' : (body.matches(':hover') ? 'shy' : 'idle'); draw(); }, ms);
   }
   function sleep() {
     if (s.asleep) return;
-    s.asleep = true; s.wave = -1; s.snot = 1;
+    s.asleep = true; s.wave = -1; s.cheer = false;
     clearInterval(typeTimer); el.classList.remove('is-talking');
     setMood(reduce ? 'sleep' : 'yawn', 0);
     if (!reduce) setTimeout(function () { if (s.asleep) setMood('sleep', 0); }, 700);
@@ -279,12 +222,12 @@
   }
   function wake(msg) {
     if (!s.asleep) return;
-    s.asleep = false; s.snot = 0;
+    s.asleep = false;
     el.classList.remove('is-asleep');
     setMood(body.matches(':hover') ? 'shy' : 'idle', 0);
     fx('bang', 520);
     if (msg) setTimeout(function () { say(msg, true); }, 160);
-    // at night he only wakes for a moment, however he was woken (a tap has no pointerleave)
+    // at night she only wakes for a moment, however she was woken (a tap has no pointerleave)
     if (night()) { clearTimeout(napTimer); napTimer = setTimeout(function () { if (night() && !body.matches(':hover')) sleep(); }, 5000); }
   }
   var waveTimer = 0;
@@ -299,7 +242,7 @@
       s.wave = s.wave ? 0 : 1; draw();
     }, 180);
   }
-  // the hair gloss: the sparkle pair runs the length of the ring
+  // the spearhead glint: a star that grows on the tip and fades
   var sheenTimer = 0, nextSheen = Date.now() + 3500;
   function sheen() {
     if (reduce || s.asleep) return;
@@ -307,9 +250,9 @@
     s.sheen = 0; draw();
     sheenTimer = setInterval(function () {
       s.sheen++;
-      if (RING.x0 + s.sheen + 1 > RING.x1) { clearInterval(sheenTimer); s.sheen = -1; }
+      if (s.sheen >= GLINT.length) { clearInterval(sheenTimer); s.sheen = -1; }
       draw();
-    }, 70);
+    }, 90);
   }
 
   /* ---- the idle loop: eight ticks a second, paused with the tab ---- */
@@ -322,7 +265,7 @@
     var nb = reduce ? 0 : Math.floor(tick / period) % 2;
     if (nb !== s.breath) {
       s.breath = nb; changed = true;
-      if (s.asleep) s.snot = reduce ? 2 : (s.snot % 3) + 1;                 // 1, 2, 3, 1 ... a breath per size
+      s.rune++;                                                             // the next glyph lights, a breath each
     }
     if (!reduce && !s.asleep && now >= nextBlink) {
       s.blink = true; changed = true;
@@ -348,7 +291,7 @@
       lookRaf = requestAnimationFrame(function () {
         lookRaf = 0;
         var r = canvas.getBoundingClientRect();
-        var dx = px - (r.left + r.width * 15.5 / GW), dyy = py - (r.top + r.height * 15 / GH);
+        var dx = px - (r.left + r.width * (HEAD[0] + 15) / GW), dyy = py - (r.top + r.height * (HEAD[1] + 15) / GH);
         var lx = dx < -48 ? -1 : dx > 48 ? 1 : 0, ly = dyy > 64 ? 1 : 0;
         if (body.matches(':hover')) { lx = 0; ly = 0; }
         if (lx !== s.look[0] || ly !== s.look[1]) { s.look = [lx, ly]; draw(); }
@@ -368,7 +311,7 @@
     });
   }
 
-  // hover: he looks right at you
+  // hover: she looks right at you
   body.addEventListener('pointerenter', function () {
     s.look = [0, 0];
     if (s.asleep) wake(night() ? 'zzz... oh, still up?' : null);
@@ -379,7 +322,8 @@
     clearTimeout(napTimer);
     if (night()) napTimer = setTimeout(sleep, 4000);
   });
-  // click: a hop with speed lines, a grin, sparkles at the top of the hop, a fact; three quick clicks fluster him
+  // click: a hop with speed lines, a grin and the spear raised, sparkles at the top of the hop, a fact;
+  // three quick clicks fluster her
   var factIx = Math.floor(Math.random() * FACTS.length), clicks = [], restUntil = 0, starTimer = 0, sayTimer = 0;
   body.addEventListener('click', function () {
     var now = Date.now();
@@ -392,12 +336,12 @@
     if (clicks.length >= 3) {
       clicks = []; restUntil = now + 1500;
       el.classList.remove('fx-stars');
-      setMood('shy', 1500); fx('drop', 1000);
+      s.cheer = false; setMood('flustered', 1500); fx('drop', 1000);
       say('Okay, okay!', true);
       return;
     }
     if (!reduce) { body.classList.remove('is-hop'); void body.offsetWidth; body.classList.add('is-hop'); fx('lines', 300); }
-    setMood('happy', 1100);
+    s.cheer = true; setMood('happy', 1100);
     starTimer = setTimeout(function () { fx('stars', 700); }, reduce ? 0 : 130);
     factIx = (factIx + 1) % FACTS.length;
     sayTimer = setTimeout(function () { say(FACTS[factIx], true); }, reduce ? 0 : 120);
@@ -411,7 +355,7 @@
   }
   document.addEventListener('section:update', function (e) { s.current = e.detail && e.detail.name; sectionSay(); });
 
-  // the theme: night puts him to bed, morning wakes him with a sparkle
+  // the theme: night puts her to bed, morning wakes her with a sparkle
   document.addEventListener('prefs:change', function (e) {
     if (e.detail.key !== 'theme') return;
     if (e.detail.value === 'dark') sleep();
@@ -429,18 +373,18 @@
     }, { passive: true });
   }
 
-  // previews and tests can set a pose: window.pxChibi.pose({ mood: 'happy', wave: 0 })
+  // previews and tests can set a pose: window.pxChibi.pose({ mood: 'happy', cheer: true })
   window.pxChibi = { pose: function (o) { Object.keys(o).forEach(function (k) { s[k] = o[k]; }); draw(); }, state: s };
 
   /* ---- start ---- */
-  if (night()) { s.asleep = true; s.mood = 'sleep'; s.snot = 1; el.classList.add('is-asleep'); }
+  if (night()) { s.asleep = true; s.mood = 'sleep'; el.classList.add('is-asleep'); }
   draw();
   function begin() {
     if (firstVisit && !reduce && !night()) {
       el.classList.add('is-enter');
       setTimeout(function () {
         s.ready = true;
-        fx('stars', 700);                                                   // he lands with a sparkle
+        fx('stars', 700);                                                   // she lands with a sparkle
         wave(1100);
         if (say(SAYS.hello_world, true)) s.said.hello_world = true;
       }, 440);

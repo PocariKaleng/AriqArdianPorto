@@ -1,5 +1,6 @@
-/* ---------- Chibi Ariq (chibi.js): the anime-pixel buddy in the bottom-right corner ----------
-   Click:   hop (0-280ms, 4 steps) with speed lines under him, a grin (0-1100ms), sparkles bursting at the top
+/* ---------- Eizel (chibi.js): Ariq's pixel heroine in the bottom-right corner ----------
+   Sizes come from the sprite: --sw x --sh pixels, the head's top-left at --hx, --hy (set by chibi.js).
+   Click:   hop (0-280ms, 4 steps) with speed lines under her, a grin (0-1100ms), sparkles bursting at the top
             of the hop (130ms), the bubble from 120ms.
    Wake:    "!" pops (0-480ms) with the eyes opening; the bubble follows at 160ms.
    Bubble:  wipes in from the corner it points at (160ms, 4 steps), types, and goes in two steps.
@@ -11,14 +12,21 @@
   pointer-events: none;
   transition: transform 200ms steps(3, end);
 }
-.chibi__body { position: relative; pointer-events: auto; cursor: pointer; }
+.chibi__body { position: relative; }
+/* only her head, body and spear take the pointer; the transparent canvas around the cape and hair does not
+   cover the links beside her */
+.chibi__hit {
+  position: absolute; pointer-events: auto; cursor: pointer;
+  left: calc((var(--hx, 12) + 1) * var(--chibi-px)); right: var(--chibi-px);
+  top: calc((var(--hy, 19) - 4) * var(--chibi-px)); bottom: 0;
+}
 .chibi__sprite {
   display: block;
-  width: calc(32 * var(--chibi-px)); height: calc(48 * var(--chibi-px));
+  width: calc(var(--sw, 48) * var(--chibi-px)); height: calc(var(--sh, 66) * var(--chibi-px));
   image-rendering: pixelated;
 }
 
-/* ---- the bubble: a small pixel window above the head, its tail pointing down at him ---- */
+/* ---- the bubble: a small pixel window above the spear, its tail pointing down at her head ---- */
 .chibi__bubble {
   --pxc: var(--line-strong);
   position: absolute; right: calc(var(--chibi-px) * 2); bottom: calc(100% + var(--s-3));
@@ -33,7 +41,7 @@
   visibility: hidden;
 }
 .chibi__bubble::after {                              /* a stepped tail: two squares */
-  content: ""; position: absolute; right: calc(var(--chibi-px) * 14); top: 100%;
+  content: ""; position: absolute; right: calc((var(--sw, 48) - var(--hx, 9) - 18) * var(--chibi-px) - var(--chibi-px) * 2); top: 100%;
   width: calc(var(--chibi-px) * 2); height: calc(var(--chibi-px) * 2);
   background: var(--line-strong);
   box-shadow: calc(var(--chibi-px) * 1) calc(var(--chibi-px) * 2) 0 0 var(--line-strong);
@@ -43,7 +51,7 @@
 @keyframes chibi-say { from { clip-path: inset(100% 0 0 100%); } to { clip-path: inset(-8px -8px -8px -8px); } }
 @keyframes chibi-hush { from { opacity: 1; } to { opacity: 0; } }
 
-/* ---- click: the hop, and anime speed lines left behind under him ---- */
+/* ---- click: the hop, and anime speed lines left behind under her ---- */
 .chibi__body.is-hop { animation: chibi-hop 280ms steps(4, end); }
 @keyframes chibi-hop { 0%, 100% { transform: none; } 45% { transform: translateY(calc(var(--chibi-px) * -5)); } }
 .chibi::before, .chibi::after {
@@ -52,8 +60,8 @@
   background: var(--muted); opacity: 0; pointer-events: none;
   box-shadow: calc(var(--chibi-px) * 3) calc(var(--chibi-px) * 2) 0 0 var(--muted);
 }
-.chibi::before { left: calc(var(--chibi-px) * 7); }
-.chibi::after { right: calc(var(--chibi-px) * 10); }
+.chibi::before { left: calc((var(--hx, 9) + 4) * var(--chibi-px)); }
+.chibi::after { right: calc((var(--sw, 48) - var(--hx, 9) - 27) * var(--chibi-px)); }
 .chibi.fx-lines::before, .chibi.fx-lines::after { animation: chibi-lines 280ms steps(4, end); }
 @keyframes chibi-lines {
   0% { opacity: 0; transform: translateY(calc(var(--chibi-px) * -4)); }
@@ -67,10 +75,10 @@
 
 /* sparkles: four pixel stars bursting outward, each on its own beat */
 .chibi__star { width: 12px; height: 12px; color: var(--sky-sun); }
-.chibi__star--1 { left: 6%; top: 4%; --tx: -8px; --ty: -10px; }
-.chibi__star--2 { right: 2%; top: 12%; width: 9px; height: 9px; --tx: 9px; --ty: -8px; }
-.chibi__star--3 { left: -2%; top: 30%; width: 9px; height: 9px; --tx: -10px; --ty: 2px; }
-.chibi__star--4 { right: -4%; top: 28%; --tx: 10px; --ty: 4px; }
+.chibi__star--1 { left: calc((var(--hx, 9) - 2) * var(--chibi-px)); top: calc((var(--hy, 18) - 2) * var(--chibi-px)); --tx: -8px; --ty: -10px; }
+.chibi__star--2 { right: 2%; top: calc((var(--hy, 18) + 2) * var(--chibi-px)); width: 9px; height: 9px; --tx: 9px; --ty: -8px; }
+.chibi__star--3 { left: -2%; top: calc((var(--hy, 18) + 14) * var(--chibi-px)); width: 9px; height: 9px; --tx: -10px; --ty: 2px; }
+.chibi__star--4 { right: -4%; top: calc((var(--hy, 18) + 12) * var(--chibi-px)); --tx: 10px; --ty: 4px; }
 .chibi.fx-stars .chibi__star { animation: chibi-star 640ms steps(6, end) backwards; }
 .chibi.fx-stars .chibi__star--2 { animation-delay: 60ms; }
 .chibi.fx-stars .chibi__star--3 { animation-delay: 110ms; }
@@ -83,8 +91,8 @@
 }
 
 /* music notes over the head while the tracks are near the pointer (or the section comes up) */
-.chibi__note { width: 10px; height: 14px; color: var(--accent); right: 10%; top: -6%; }
-.chibi__note--2 { right: 30%; top: -2%; width: 8px; height: 11px; }
+.chibi__note { width: 10px; height: 14px; color: var(--accent); right: 10%; top: calc((var(--hy, 18) - 6) * var(--chibi-px)); }
+.chibi__note--2 { right: 34%; top: calc((var(--hy, 18) - 4) * var(--chibi-px)); width: 8px; height: 11px; }
 .chibi.fx-notes .chibi__note { animation: chibi-note 1.6s steps(8, end) backwards; }
 .chibi.fx-notes .chibi__note--2 { animation-delay: .4s; animation-duration: 1.2s; }
 @keyframes chibi-note {
@@ -96,7 +104,7 @@
 }
 
 /* the sweat drop at the side of the head: flustered */
-.chibi__drop { width: 8px; height: 12px; color: #7FC0EC; left: 12%; top: 12%; }
+.chibi__drop { width: 8px; height: 12px; color: #7FC0EC; left: calc((var(--hx, 9) + 1) * var(--chibi-px)); top: calc((var(--hy, 18) + 8) * var(--chibi-px)); }
 .chibi.fx-drop .chibi__drop { animation: chibi-drop 900ms steps(5, end); }
 @keyframes chibi-drop {
   0% { opacity: 0; transform: translateY(-4px); }
@@ -107,7 +115,7 @@
 
 /* waking: a "!" over the head */
 .chibi__bang {
-  position: absolute; left: 50%; top: calc(var(--chibi-px) * -6);
+  position: absolute; left: calc((var(--hx, 9) + 15) * var(--chibi-px)); top: calc((var(--hy, 18) - 6) * var(--chibi-px));
   font-family: var(--font-display); font-weight: var(--display-weight); font-size: 18px; line-height: 1;
   color: var(--accent);
   opacity: 0; transform: translateX(-50%);
@@ -119,9 +127,9 @@
   100% { opacity: 0; transform: translate(-50%, 0); }
 }
 
-/* asleep: z, z, Z rising from the head (the snot bubble is drawn in the sprite) */
+/* asleep: z, z, Z rising from the head */
 .chibi__z {
-  position: absolute; left: 66%; top: calc(var(--chibi-px) * 3);
+  position: absolute; left: calc((var(--hx, 9) + 21) * var(--chibi-px)); top: calc((var(--hy, 18) + 2) * var(--chibi-px));
   font-family: var(--font-display); font-weight: var(--display-weight); font-size: 12px; line-height: 1;
   color: var(--muted); opacity: 0;
 }
@@ -135,7 +143,7 @@
   100% { opacity: 0; transform: translate(calc(var(--chibi-px) * 6), calc(var(--chibi-px) * -10)); }
 }
 
-/* the first page of a visit: he climbs up onto his block from below the screen */
+/* the first page of a visit: she climbs up onto her rune stone from below the screen */
 .chibi.is-enter { animation: chibi-enter 420ms steps(6, end) backwards; }
 @keyframes chibi-enter { from { transform: translateY(100%); } to { transform: none; } }
 

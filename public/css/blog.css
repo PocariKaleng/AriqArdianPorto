@@ -114,8 +114,8 @@
   grid-column: 2; grid-row: 1;
   position: sticky; top: var(--s-9);
   display: grid; gap: var(--s-3); align-content: start;
-  /* it stops above the bottom-right corner, where the chibi and his speech bubble live; a long list scrolls inside */
-  max-height: calc(100vh - var(--s-9) - 15rem); overflow: auto; overscroll-behavior: contain;
+  /* it stops above the bottom-right corner, where Eizel (the chibi) and her speech bubble live; a long list scrolls inside */
+  max-height: calc(100vh - var(--s-9) - 19rem); overflow: auto; overscroll-behavior: contain;
 }
 .toc__title { color: var(--ink); }
 .toc ol { display: grid; box-shadow: inset 1px 0 0 var(--line-strong); }
