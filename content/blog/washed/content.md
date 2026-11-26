@@ -1,9 +1,9 @@
 > **Category:** Cryptography · **Event:** SCHEMATICS 2026 Final · **Points:** 500  
 > **Challenge author:** **Idzoyy**, whose whole description was *"mas standar e mas"*
 
-Well, this one is special to me. **Washed** was a finals challenge, I got **first blood** 🩸 on it, and it stayed the **only solve** until the competition ended.
+Well, this one is special to me. **Washed** was a finals challenge, it stayed the **only solve** until the competition ended.
 
-The description jokes that the challenge is "standard". It is RSA after all: a 2048-bit modulus, a ciphertext, and two leaks. But the leaks come from the **CRT exponents**, the exponents are **blinded**, and almost two thirds of every leaked exponent is missing. Underneath the jokes sits a 2022 research attack.
+It is RSA after all: a 2048-bit modulus, a ciphertext, and two leaks. But the leaks come from the **CRT exponents**, the exponents are **blinded**, and almost two thirds of every leaked exponent is missing. 
 
 > **TL;DR:** The blinded CRT exponents satisfy $ed_p'-1=k'(p-1)$ and $ed_q'-1=l'(q-1)$. Their leaked MSBs give the product $M=k'l'$ almost exactly. A congruence modulo $e$ fixes $k'+l'$ up to a multiple of $e$, so a 4-billion-step search over that multiple splits $M$ without factoring it. With $k'$ in hand, the unknown LSBs of $d_p'$ shrink to a 485-bit root, and univariate Coppersmith ($\beta=0.5$, $\varepsilon=0.0125$) finds $p$.
 
