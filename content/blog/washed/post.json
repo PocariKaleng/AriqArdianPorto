@@ -1,0 +1,9 @@
+{
+  "slug": "washed",
+  "title": "Washed",
+  "excerpt": "SCHEMATICS 2026 Final: CRT-RSA with additively blinded exponents and partial MSB leaks. Recover k' and l' from a congruence modulo e, then let Coppersmith find p.",
+  "tags": "Cryptography, RSA, Coppersmith, Lattice, CTF",
+  "status": "published",
+  "published_at": "2026-11-26T09:00:00.000Z",
+  "updated_at": "2026-11-26T09:00:00.000Z"
+}
