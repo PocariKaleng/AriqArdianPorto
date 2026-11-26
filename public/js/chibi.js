@@ -73,7 +73,8 @@
     the_final_trap: "Careful, there's a trap at the end.",
     solver_and_execution: 'The flag is close now.'
   };
-  var FACTS = ['3 podiums, 6 finals, 1 best writeup.', '11 writeups, 1,131 pages.', 'Ariq studies IT at Universitas Brawijaya.', 'Ariq leads Hack It Braw.', 'flag{you_found_eizel}'];
+  var FACTS = ["I'm Eizel, Ariq's guide around here. Nice to meet you!", 'Ariq has 3 podiums, 6 finals and 1 best writeup.',
+    'He wrote 11 writeups, 1,131 pages in all.', 'He studies IT at Universitas Brawijaya.', 'flag{you_found_eizel}'];
 
   /* ---- DOM: the sprite, the bubble and a fixed pool of effect nodes ---- */
   var STAR = '<svg viewBox="0 0 5 5" shape-rendering="crispEdges"><path d="M2 0h1v2h2v1H3v2H2V3H0V2h2z"/></svg>';
